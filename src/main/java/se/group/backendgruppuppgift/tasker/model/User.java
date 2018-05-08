@@ -1,9 +1,6 @@
 package se.group.backendgruppuppgift.tasker.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public final class User {
@@ -25,6 +22,9 @@ public final class User {
     private String lastName;
 
     private boolean isActive;
+
+    @ManyToOne
+    private Team team;
 
     protected User() {}
 
