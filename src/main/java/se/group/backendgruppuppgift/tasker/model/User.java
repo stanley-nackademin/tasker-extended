@@ -1,6 +1,7 @@
 package se.group.backendgruppuppgift.tasker.model;
 
 import javax.persistence.*;
+import java.util.Collection;
 
 @Entity
 public final class User {
@@ -23,6 +24,8 @@ public final class User {
 
     @ManyToOne
     private Team team;
+    @OneToMany(mappedBy = "user")
+    private Collection<Task> tasks;
 
     private boolean isActive;
 
