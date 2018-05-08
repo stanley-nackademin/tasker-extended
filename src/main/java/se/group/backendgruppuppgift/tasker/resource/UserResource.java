@@ -4,18 +4,18 @@ import org.springframework.stereotype.Component;
 import se.group.backendgruppuppgift.tasker.model.User;
 import se.group.backendgruppuppgift.tasker.service.UserService;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import java.net.URI;
+import java.util.Optional;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
+
+import static javax.ws.rs.core.Response.Status.*;
 @Component
 @Consumes(APPLICATION_JSON)
 @Produces(APPLICATION_JSON)
@@ -40,5 +40,12 @@ public final class UserResource {
                 .path(result.getId().toString())
                 .toString()))
                 .build();
+    }
+
+    @DELETE
+    @Path("{id}")
+    public Response deleteUser(@PathParam ("id") Long id){
+        Optional<User> result = service.deleteUser(id);
+        return result.map(r -> Response.status(NO_CONTENT)).orElse(Response.status(NOT_FOUND)).build();
     }
 }
