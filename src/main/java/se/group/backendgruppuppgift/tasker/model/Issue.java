@@ -14,6 +14,7 @@ public class Issue {
     private String description;
 
     @OneToOne
+    @JoinColumn(unique = true)
     private Task task;
 
     protected Issue() {

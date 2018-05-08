@@ -16,8 +16,7 @@ public class Task {
 
     @ManyToOne
     private User user;
-    @OneToOne
-    @JoinColumn
+    @OneToOne(mappedBy = "task")
     private Issue issue;
 
     protected Task() {
