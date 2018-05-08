@@ -24,18 +24,19 @@ public final class User {
     @Column(nullable = false)
     private boolean isActive;
 
-//    @ManyToOne
-//    private Team team;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
 
     protected User() {}
 
-    public User(Long userNumber, String username, String firstName, String lastName, boolean isActive) {
+    public User(Long userNumber, String username, String firstName, String lastName, boolean isActive, Team team) {
         this.userNumber = userNumber;
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.isActive = isActive;
-//        this.team = team;
+        this.isActive = true;
+        this.team = team;
     }
 
     public Long getId() {
@@ -62,9 +63,9 @@ public final class User {
         return isActive;
     }
 
-//    public Team getTeam() {
-//        return team;
-//    }
+    public Team getTeam() {
+        return team;
+    }
 
     @Override
     public String toString() {

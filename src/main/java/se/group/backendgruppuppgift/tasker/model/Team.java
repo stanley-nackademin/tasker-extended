@@ -1,7 +1,6 @@
 package se.group.backendgruppuppgift.tasker.model;
 
 import javax.persistence.*;
-import java.util.Collection;
 
 @Entity
 public final class Team {
@@ -12,9 +11,6 @@ public final class Team {
 
     @Column(nullable = false)
     private String name;
-
-//    @OneToMany(mappedBy = "team")
-//    private Collection<User> users;
 
     @Column(nullable = false)
     private boolean isActive;
@@ -37,9 +33,4 @@ public final class Team {
     public boolean isActive() {
         return isActive;
     }
-
-//    public Collection<User> getUsers() {
-//        return users;
-//    }
-
 }
