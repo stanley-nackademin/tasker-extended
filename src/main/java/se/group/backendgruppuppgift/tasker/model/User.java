@@ -24,8 +24,13 @@ public final class User {
     @Column(nullable = false)
     private boolean isActive;
 
+<<<<<<< HEAD
 //    @ManyToOne
 //    private Team team;
+=======
+    @ManyToOne
+    private Team team;
+>>>>>>> 7f2547380ea8fe322f6dd4e602f4b10f615af10e
 
     protected User() {}
 
