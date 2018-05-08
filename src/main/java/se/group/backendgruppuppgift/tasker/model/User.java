@@ -1,15 +1,12 @@
 package se.group.backendgruppuppgift.tasker.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public final class User {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -24,16 +21,21 @@ public final class User {
     @Column(nullable = false)
     private String lastName;
 
+    @Column(nullable = false)
     private boolean isActive;
+
+//    @ManyToOne
+//    private Team team;
 
     protected User() {}
 
-    public User(Long userNumber, String username, String firstName, String lastName) {
+    public User(Long userNumber, String username, String firstName, String lastName, boolean isActive) {
         this.userNumber = userNumber;
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.isActive = true;
+        this.isActive = isActive;
+//        this.team = team;
     }
 
     public Long getId() {
@@ -59,6 +61,10 @@ public final class User {
     public boolean isActive() {
         return isActive;
     }
+
+//    public Team getTeam() {
+//        return team;
+//    }
 
     @Override
     public String toString() {
