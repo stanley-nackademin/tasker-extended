@@ -18,8 +18,8 @@ public final class Task {
     @ManyToOne
     private User user;
 
-    @OneToOne
-    @JoinColumn
+    @OneToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(unique = true)
     private Issue issue;
 
     protected Task() {}

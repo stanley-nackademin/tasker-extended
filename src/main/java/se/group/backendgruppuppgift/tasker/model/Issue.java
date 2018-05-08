@@ -12,8 +12,7 @@ public final class Issue {
     @Column(nullable = false)
     private String description;
 
-    @OneToOne
-    @JoinColumn
+    @OneToOne(mappedBy = "issue")
     private Task task;
 
     @Column(nullable = false)
