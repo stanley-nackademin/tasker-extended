@@ -3,28 +3,30 @@ package se.group.backendgruppuppgift.tasker.model;
 import javax.persistence.*;
 
 @Entity
-public class Task {
+public final class Task {
 
-    @GeneratedValue
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
     private String name;
+
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
 
     @ManyToOne
     private User user;
-    @OneToOne(mappedBy = "task")
+
+    @OneToOne
+    @JoinColumn
     private Issue issue;
 
-    protected Task() {
-    }
+    protected Task() {}
 
     public Task(String name, TaskStatus status) {
         this.name = name;
-        this.status = TaskStatus.Unstarted;
+        this.status = status;
     }
 
     public Long getId() {
@@ -39,7 +41,7 @@ public class Task {
         return status;
     }
 
-    public User getUser() {
-        return user;
+    public Issue getIssue() {
+        return issue;
     }
 }

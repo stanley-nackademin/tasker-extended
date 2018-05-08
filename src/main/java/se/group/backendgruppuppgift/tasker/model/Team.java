@@ -1,28 +1,25 @@
 package se.group.backendgruppuppgift.tasker.model;
 
 import javax.persistence.*;
-import java.util.Collection;
 
 @Entity
-public class Team {
+public final class Team {
 
-    @GeneratedValue
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(nullable = false)
     private String name;
+
     @Column(nullable = false)
-    private boolean active;
+    private boolean isActive;
 
-    @OneToMany(mappedBy = "team")
-    private Collection<User> users;
+    protected Team(){}
 
-    public Team(String name) {
+    public Team(String name, boolean isActive) {
         this.name = name;
-        this.active = true;
-    }
-
-    protected Team() {
+        this.isActive = isActive;
     }
 
     public Long getId() {
@@ -34,10 +31,6 @@ public class Team {
     }
 
     public boolean isActive() {
-        return active;
-    }
-
-    public Collection<User> getUsers() {
-        return users;
+        return isActive;
     }
 }

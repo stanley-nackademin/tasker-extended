@@ -3,35 +3,32 @@ package se.group.backendgruppuppgift.tasker.model;
 import javax.persistence.*;
 
 @Entity
-public class Issue {
+public final class Issue {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
-    private boolean done;
+
     @Column(nullable = false)
     private String description;
 
     @OneToOne
-    @JoinColumn(unique = true)
+    @JoinColumn
     private Task task;
 
-    protected Issue() {
-    }
+    @Column(nullable = false)
+    private boolean isDone;
+
+    protected Issue() {}
 
     public Issue(String description, Task task) {
         this.description = description;
         this.task = task;
-        this.done = false;
+        this.isDone = false;
     }
 
     public Long getId() {
         return id;
-    }
-
-    public boolean isDone() {
-        return done;
     }
 
     public String getDescription() {
@@ -40,5 +37,9 @@ public class Issue {
 
     public Task getTask() {
         return task;
+    }
+
+    public boolean isDone() {
+        return isDone;
     }
 }

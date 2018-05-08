@@ -7,7 +7,7 @@ import java.util.Collection;
 public final class User {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -22,21 +22,25 @@ public final class User {
     @Column(nullable = false)
     private String lastName;
 
-    @ManyToOne
+    @Column(nullable = false)
+    private boolean isActive;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn
     private Team team;
+
     @OneToMany(mappedBy = "user")
     private Collection<Task> tasks;
 
-    private boolean isActive;
-
     protected User() {}
 
-    public User(Long userNumber, String username, String firstName, String lastName) {
+    public User(Long userNumber, String username, String firstName, String lastName, boolean isActive, Team team) {
         this.userNumber = userNumber;
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.isActive = true;
+        this.team = team;
     }
 
     public Long getId() {
@@ -61,6 +65,22 @@ public final class User {
 
     public boolean isActive() {
         return isActive;
+    }
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public Collection<Task> getTasks() {
+        return tasks;
+    }
+
+    public void addTask(Task task) {
+        tasks.add(task);
+    }
+
+    public void removeTask(Task task) {
+        tasks.remove(task);
     }
 
     @Override
