@@ -50,14 +50,13 @@ public final class TeamService {
 
         //Todo: how to add team without setters???
 
-        Optional<User> optionalUser = userRepository.findByUserNumber(user.getUserNumber());
+        Optional<User> optionalUser = userRepository.findUserByUserNumber(user.getUserNumber());
         //optionalUser.get().setTeam(team);
-
         userRepository.save(user);
     }
 
     private void maxUserLimitValidation(Team team) {
-           List<User> users = userRepository.findByTeam(team);
+           List<User> users = userRepository.findUsersByTeam(team);
                 if(users.size()  >= 10){
                     throw new InvalidTeamException("Team: "+ team.getName() + " is full, max 10 users in a team");
                 }

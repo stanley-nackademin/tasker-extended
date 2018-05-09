@@ -30,12 +30,6 @@ public final class UserResource {
         this.service = service;
     }
 
-    @GET
-    @Path("{id}")
-    public Response getUser(@PathParam("id") Long id){
-        return Response.ok(service.getUser(id)).build();
-    }
-
     @POST
     public Response createUser(User user) {
         User result = service.createUser(user);

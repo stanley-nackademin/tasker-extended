@@ -2,6 +2,7 @@ package se.group.backendgruppuppgift.tasker.repository;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
+import se.group.backendgruppuppgift.tasker.model.Team;
 import se.group.backendgruppuppgift.tasker.model.User;
 
 import javax.transaction.Transactional;
@@ -17,6 +18,9 @@ public interface UserRepository extends CrudRepository<User, Long> {
     Long removeByUserNumber (Long userNumber);
 
     List<User> findUsersByTeamId(Long teamId);
+
+    //jonasmergeADD
+    List<User> findUsersByTeam(Team team);
 
     List<User> findUsersByFirstName(String firstName);
     List<User> findUsersByUsername(String userName);

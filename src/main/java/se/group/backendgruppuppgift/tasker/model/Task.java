@@ -18,11 +18,7 @@ public final class Task {
     @ManyToOne
     private User user;
 
-<<<<<<< .merge_file_a08228
-    @OneToOne
-=======
     @OneToOne(cascade = CascadeType.REMOVE)
->>>>>>> .merge_file_a04652
     @JoinColumn(unique = true)
     private Issue issue;
 
