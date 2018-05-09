@@ -13,13 +13,13 @@ public final class Team {
     private String name;
 
     @Column(nullable = false)
-    private boolean isActive;
+    private boolean active;
 
     protected Team(){}
 
-    public Team(String name, boolean isActive) {
+    public Team(String name, boolean active) {
         this.name = name;
-        this.isActive = isActive;
+        this.active = active;
     }
 
     public Long getId() {
@@ -31,6 +31,6 @@ public final class Team {
     }
 
     public boolean isActive() {
-        return isActive;
+        return active;
     }
 }

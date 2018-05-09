@@ -35,7 +35,7 @@ public final class User {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.isActive = true;
+        this.isActive = isActive;
         this.team = team;
     }
 
@@ -59,7 +59,7 @@ public final class User {
         return lastName;
     }
 
-    public boolean isActive() {
+    public boolean getIsActive() {
         return isActive;
     }
 
