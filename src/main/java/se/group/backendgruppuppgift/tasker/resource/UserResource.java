@@ -8,11 +8,13 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-
 import java.net.URI;
+import java.util.List;
+import java.util.Optional;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
+import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 @Component
 @Consumes(APPLICATION_JSON)
 @Produces(APPLICATION_JSON)
@@ -43,5 +45,43 @@ public final class UserResource {
                 .path(result.getId().toString())
                 .toString()))
                 .build();
+    }
+
+    @DELETE
+    @Path("{userNumber}")
+    public Response deleteUserByUserNumber(@PathParam ("userNumber") Long userNumber){
+        Optional<User> result = service.deleteUserByUserNumber(userNumber);
+        return result.map(r -> Response.status(NO_CONTENT)).orElse(Response.status(NOT_FOUND)).build();
+    }
+
+    @PUT
+    @Path("{id}")
+    public Response updateUser(@PathParam("id") Long id, User user){
+        service.updateUser(user);
+        return Response.status(NO_CONTENT).build();
+    }
+
+    @GET
+    @Path("{userNumber}")
+    public Response getUser(@PathParam("userNumber") Long userNumber) {
+        return service.findUserByUserNumber(userNumber)
+                .map(Response::ok)
+                .orElse(Response.status(NOT_FOUND))
+                .build();
+    }
+
+    @GET
+    @Path("/teams/{teamId}")
+    public Response getAllUsersByTeam(@PathParam("teamId") Long teamId){
+        return Response.ok(service.findUsersByTeamId(teamId)).build();
+    }
+
+    @GET
+    public Response getUsers(@QueryParam("firstname") @DefaultValue("") String firstName,
+                             @QueryParam("lastname" ) @DefaultValue("") String lastName,
+                             @QueryParam("username") @DefaultValue("") String userName){
+
+        List<User> users = service.findAllUsersBy(firstName.toLowerCase(),lastName.toLowerCase(),userName.toLowerCase());
+        return Response.ok(service.findAllUsersBy(firstName.toLowerCase(),lastName.toLowerCase(),userName.toLowerCase())).build();
     }
 }
