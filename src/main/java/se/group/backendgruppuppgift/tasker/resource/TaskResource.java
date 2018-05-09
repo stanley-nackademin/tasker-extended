@@ -11,6 +11,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -59,10 +60,28 @@ public final class TaskResource {
                 .build();
     }
 
+
+
     @GET
-    public List<Task> findTaskByStatus(@QueryParam("status") String status){
-        return service.findTaskByStatus(status);
+    public Response findTaskByParameter(@QueryParam("status") @DefaultValue("") String status, @QueryParam("text") @DefaultValue("") String text){
+        System.out.println("status = "+status);
+        System.out.println("text = "+text);
+        if(!status.isEmpty()){
+            return Response.ok(service.findTaskByStatus(status)).build();
+        }
+
+        else if(!text.isEmpty()){
+            return Response.ok(service.findTaskByText(text)).build();
+        }
+
+        return Response.status(NOT_FOUND).build();
+
     }
+    /*@DELETE
+    @Path("{id}")
+    public void deleteTaskById(@PathParam("id") Long id){
+        service.deleteTaskById(id);
+    }*/
 
 
 }

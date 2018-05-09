@@ -8,7 +8,6 @@ import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
 import se.group.backendgruppuppgift.tasker.repository.TaskRepository;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,21 +62,30 @@ public final class TaskService {
 
         if(status.equals("started"))
         {
-            return repository.findByStatus(TaskStatus.STARTED);
+            return repository.findTaskByStatus(TaskStatus.STARTED);
         }
 
         else if(status.equals("unstarted"))
         {
-            return repository.findByStatus(TaskStatus.UNSTARTED);
+            return repository.findTaskByStatus(TaskStatus.UNSTARTED);
         }
 
         else if(status.equals("done"))
         {
-            return repository.findByStatus(TaskStatus.DONE);
+            return repository.findTaskByStatus(TaskStatus.DONE);
         }
 
         return new ArrayList<>();
 
+    }
+
+    public List<Task> findTaskByText(String searchText){
+        String result = checkString(searchText);
+        return repository.findAllByNameContains(result);
+    }
+
+    public void deleteTaskById(Long id){
+        repository.deleteById(id);
     }
 
     public String checkString(String string){
@@ -91,4 +99,5 @@ public final class TaskService {
 
 
     }
+
 }
