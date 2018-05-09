@@ -19,7 +19,7 @@ public final class Task {
     private User user;
 
     @OneToOne
-    @JoinColumn
+    @JoinColumn(unique = true)
     private Issue issue;
 
     protected Task() {}
