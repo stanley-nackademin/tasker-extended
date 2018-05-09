@@ -4,16 +4,15 @@ import org.springframework.stereotype.Component;
 import se.group.backendgruppuppgift.tasker.model.Team;
 import se.group.backendgruppuppgift.tasker.service.TeamService;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
+import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 
 @Component
 @Consumes(APPLICATION_JSON)
@@ -39,5 +38,37 @@ public final class TeamResource {
                 .path(result.getId().toString())
                 .toString()))
                 .build();
+    }
+
+    //Todo: add user to team method
+
+    @GET
+    @Path("{id}")
+    public Response getTeam(@PathParam("id") Long id){
+        return service.getTeam(id).map(Response::ok)
+                                  .orElse(Response.status(NOT_FOUND))
+                                  .build();
+    }
+
+    @PUT
+    @Path("{id}")
+    public Response updateTeam(@PathParam("id")Long id, Team team){
+        service.updateTeam(team);
+        return service.getTeam(id).map(Response::ok)
+                                  .orElse(Response.status(NOT_FOUND))
+                                  .build();
+    }
+
+    @GET
+    public Response getAllTeams(){
+        return Response.ok(service.getAllTeams()).build();
+    }
+
+    @DELETE
+    @Path("{id}")
+    public Response deleteTeam(@PathParam("id") Long id){
+        return service.deleteTeam(id).map(todo -> Response.status(NO_CONTENT))
+                                     .orElse(Response.status(NOT_FOUND))
+                                     .build();
     }
 }
