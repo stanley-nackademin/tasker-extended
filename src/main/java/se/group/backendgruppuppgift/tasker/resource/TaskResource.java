@@ -11,6 +11,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
+import java.util.List;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.*;
@@ -59,9 +60,9 @@ public final class TaskResource {
     }
 
     @GET
-    public Response findTaskByStatus(@QueryParam("status") TaskStatus status){
-        return service.findTaskByStatus(status).map(Response::ok)
-                .orElse(Response.status(NOT_FOUND))
-                .build();
+    public List<Task> findTaskByStatus(@QueryParam("status") String status){
+        return service.findTaskByStatus(status);
     }
+
+
 }

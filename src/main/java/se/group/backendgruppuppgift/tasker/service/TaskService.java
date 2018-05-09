@@ -3,9 +3,13 @@ package se.group.backendgruppuppgift.tasker.service;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import se.group.backendgruppuppgift.tasker.model.Task;
+import se.group.backendgruppuppgift.tasker.model.TaskStatus;
 import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
 import se.group.backendgruppuppgift.tasker.repository.TaskRepository;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -42,5 +46,49 @@ public final class TaskService {
         }
 
         return Optional.empty();
+    }
+
+    public Optional<Task> findTask(Long id) {
+        return repository.findById(id);
+    }
+
+    public void deleteTask(Long id){
+
+        repository.deleteById(id);
+    }
+
+    public List<Task> findTaskByStatus(String status){
+
+        status = checkString(status);
+
+        if(status.equals("started"))
+        {
+            return repository.findByStatus(TaskStatus.STARTED);
+        }
+
+        else if(status.equals("unstarted"))
+        {
+            return repository.findByStatus(TaskStatus.UNSTARTED);
+        }
+
+        else if(status.equals("done"))
+        {
+            return repository.findByStatus(TaskStatus.DONE);
+        }
+
+        return new ArrayList<>();
+
+    }
+
+    public String checkString(String string){
+
+        String result = string;
+
+        result = result.trim();
+        result = result.toLowerCase();
+
+        return result;
+
+
     }
 }
