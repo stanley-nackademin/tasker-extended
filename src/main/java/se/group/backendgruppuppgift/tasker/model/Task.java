@@ -18,8 +18,12 @@ public final class Task {
     @ManyToOne
     private User user;
 
+<<<<<<< .merge_file_a08228
     @OneToOne
-    @JoinColumn
+=======
+    @OneToOne(cascade = CascadeType.REMOVE)
+>>>>>>> .merge_file_a04652
+    @JoinColumn(unique = true)
     private Issue issue;
 
     protected Task() {}
@@ -43,5 +47,33 @@ public final class Task {
 
     public Issue getIssue() {
         return issue;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setStatus(TaskStatus status) {
+        this.status = status;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setIssue(Issue issue) {
+        this.issue = issue;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "User[id=%d, name='%s', status='%s'",
+                id, name, status
+        );
     }
 }

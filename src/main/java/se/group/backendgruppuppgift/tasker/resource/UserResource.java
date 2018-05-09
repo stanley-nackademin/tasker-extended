@@ -4,10 +4,7 @@ import org.springframework.stereotype.Component;
 import se.group.backendgruppuppgift.tasker.model.User;
 import se.group.backendgruppuppgift.tasker.service.UserService;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -29,6 +26,12 @@ public final class UserResource {
 
     public UserResource(UserService service) {
         this.service = service;
+    }
+
+    @GET
+    @Path("{id}")
+    public Response getUser(@PathParam("id") Long id){
+        return Response.ok(service.getUser(id)).build();
     }
 
     @POST
