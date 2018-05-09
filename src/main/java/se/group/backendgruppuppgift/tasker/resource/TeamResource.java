@@ -2,6 +2,7 @@ package se.group.backendgruppuppgift.tasker.resource;
 
 import org.springframework.stereotype.Component;
 import se.group.backendgruppuppgift.tasker.model.Team;
+import se.group.backendgruppuppgift.tasker.model.web.TeamWeb;
 import se.group.backendgruppuppgift.tasker.service.TeamService;
 
 import javax.ws.rs.*;
@@ -30,17 +31,14 @@ public final class TeamResource {
     }
 
     @POST
-    public Response createTeam(Team team) {
-        Team result = service.createTeam(team);
-
+    public Response createTeam(TeamWeb teamWeb) {
+        Team result = service.createTeam(teamWeb);
         return Response.created(URI.create(uriInfo
                 .getAbsolutePathBuilder()
                 .path(result.getId().toString())
                 .toString()))
                 .build();
     }
-
-    //Todo: add user to team method
 
     @GET
     @Path("{id}")
@@ -52,8 +50,8 @@ public final class TeamResource {
 
     @PUT
     @Path("{id}")
-    public Response updateTeam(@PathParam("id")Long id, Team team){
-        service.updateTeam(team);
+    public Response updateTeam(@PathParam("id")Long id, TeamWeb teamWeb){
+        service.updateTeam(id, teamWeb);
         return service.getTeam(id).map(Response::ok)
                                   .orElse(Response.status(NOT_FOUND))
                                   .build();
