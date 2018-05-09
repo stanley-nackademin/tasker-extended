@@ -30,7 +30,28 @@ public final class Team {
         return name;
     }
 
-    public boolean isActive() {
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean getIsActive() {
         return isActive;
+    }
+
+    @Override
+    public String toString() {
+        return "Team{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", isActive=" + isActive +
+                '}';
     }
 }
