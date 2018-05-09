@@ -58,24 +58,4 @@ public final class UserService {
             {return repository.findUsersByFirstNameAndLastNameAndUsername(firstName, lastName, userName);
         }
     }
-
-    /*
-    System.out.println(firstName + lastName + userName);
-        if (firstName !=null && lastName == null && userName == null){ // om allt är null förutom firstname
-           return repository.findUsersByFirstName(firstName);
-        }else if(firstName == null && lastName != null && userName == null){ // om allt är null förutom lastname
-            return repository.findUsersByLastName(lastName);
-        }else if(firstName == null && lastName == null && userName != null){ // om allt är null förutom username
-            return repository.findUsersByUsername(userName);
-        }else if (firstName != null && lastName !=null && userName == null){ // om allt är null förutom firsntame och lastname
-            return repository.findUsersByFirstNameAndLastName(firstName,lastName);
-        }else if (firstName != null && lastName ==null && userName != null){ // om allt är null förutom firstNAme och username
-            return repository.findUsersByFirstNameAndUsername(firstName,userName);
-        }else if(firstName == null && lastName != null && userName!= null){ // om firstname är null
-            return repository.findUsersByUsernameAndLastName(userName, lastName);
-        }else
-            {return repository.findUsersByFirstNameAndLastNameAndUsername(firstName, lastName, userName);
-        }
-
-     */
 }
