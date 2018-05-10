@@ -11,8 +11,9 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Provider
 public final class InvalidTeamMapper implements ExceptionMapper<InvalidTeamException>{
+
     @Override
     public Response toResponse(InvalidTeamException exception){
-        return Response.status(BAD_REQUEST).entity(singletonMap("ERROR", exception.getMessage())).build();
+        return Response.status(BAD_REQUEST).entity(singletonMap("error", exception.getMessage())).build();
     }
 }

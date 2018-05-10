@@ -34,7 +34,7 @@ public final class User {
 
     protected User() {}
 
-    public User(Long userNumber, String username, String firstName, String lastName, boolean isActive, Team team) {
+    public User(Long userNumber, String username, String firstName, String lastName, Team team) {
         this.userNumber = userNumber;
         this.username = username;
         this.firstName = firstName;
@@ -63,7 +63,7 @@ public final class User {
         return lastName;
     }
 
-    public boolean isActive() {
+    public boolean getIsActive() {
         return isActive;
     }
 
@@ -83,11 +83,27 @@ public final class User {
         tasks.remove(task);
     }
 
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setIsActive(boolean active) {
+        isActive = active;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
+    }
+
     @Override
     public String toString() {
         return String.format(
-                "User[id=%d, userNumber=%d, firstName='%s', lastName='%s', isActive=%s",
-                id, userNumber, firstName, lastName, isActive
+                "User[id=%d, userNumber=%d, firstName='%s', lastName='%s', isActive=%s, team=%s, tasks=%s]",
+                id, userNumber, firstName, lastName, isActive, team, tasks
         );
     }
 }

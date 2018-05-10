@@ -10,6 +10,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
+import java.util.List;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
@@ -32,7 +33,8 @@ public final class TeamResource {
 
     @POST
     public Response createTeam(TeamWeb teamWeb) {
-        Team result = service.createTeam(teamWeb);
+        TeamWeb result = service.createTeam(teamWeb);
+
         return Response.created(URI.create(uriInfo
                 .getAbsolutePathBuilder()
                 .path(result.getId().toString())
@@ -40,33 +42,37 @@ public final class TeamResource {
                 .build();
     }
 
+    //Todo: add user to team method
+
+    @GET
+    public List<Team> getAllTeams() {
+        return service.getAllTeams();
+    }
+
     @GET
     @Path("{id}")
-    public Response getTeam(@PathParam("id") Long id){
-        return service.getTeam(id).map(Response::ok)
-                                  .orElse(Response.status(NOT_FOUND))
-                                  .build();
+    public Response findTeam(@PathParam("id") Long id) {
+        return service.findTeam(id)
+                .map(Response::ok)
+                .orElse(Response.status(NOT_FOUND))
+                .build();
     }
 
     @PUT
     @Path("{id}")
-    public Response updateTeam(@PathParam("id")Long id, TeamWeb teamWeb){
-        service.updateTeam(id, teamWeb);
-        return service.getTeam(id).map(Response::ok)
-                                  .orElse(Response.status(NOT_FOUND))
-                                  .build();
-    }
-
-    @GET
-    public Response getAllTeams(){
-        return Response.ok(service.getAllTeams()).build();
+    public Response updateTeam(@PathParam("id") Long id, TeamWeb team) {
+        return service.updateTeam(id, team)
+                .map(Response::ok)
+                .orElse(Response.status(NOT_FOUND))
+                .build();
     }
 
     @DELETE
     @Path("{id}")
-    public Response deleteTeam(@PathParam("id") Long id){
-        return service.deleteTeam(id).map(todo -> Response.status(NO_CONTENT))
-                                     .orElse(Response.status(NOT_FOUND))
-                                     .build();
+    public Response deleteTeam(@PathParam("id") Long id) {
+        return service.deleteTeam(id)
+                .map(todo -> Response.status(NO_CONTENT))
+                .orElse(Response.status(NOT_FOUND))
+                .build();
     }
 }

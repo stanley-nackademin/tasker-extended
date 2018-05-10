@@ -1,15 +1,16 @@
 package se.group.backendgruppuppgift.tasker.service;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import se.group.backendgruppuppgift.tasker.model.Task;
-import se.group.backendgruppuppgift.tasker.model.TaskStatus;
 import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
 import se.group.backendgruppuppgift.tasker.repository.TaskRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static se.group.backendgruppuppgift.tasker.model.TaskStatus.*;
 
 @Service
 public final class TaskService {
@@ -20,84 +21,82 @@ public final class TaskService {
         this.repository = repository;
     }
 
+    public TaskWeb createTask(TaskWeb task) {
+        Task repoTask = repository.save(new Task(task.getName(), task.getStatus()));
 
-    public Task createTask(TaskWeb task) {
-        System.out.println(task); // TODO: 2018-05-09 Remove in final stage of development
-        return repository.save(new Task(task.getName(), task.getStatus()));
+        return convertToWeb(repoTask);
     }
 
-    public Optional<Task> updateTask(Long id, TaskWeb task) {
-        Optional<Task> result = repository.findById(id);
-        System.out.println(task);
-        if (result.isPresent()) {
-            Task updatedTask = result.get();
+    public Optional<TaskWeb> findTask(Long id) {
+        Optional<Task> repoTask = repository.findById(id);
 
-            if (!StringUtils.isBlank(task.getName())) {
+        if (repoTask.isPresent())
+            return Optional.ofNullable(convertToWeb(repoTask.get()));
+
+        return Optional.empty();
+    }
+
+    public List<TaskWeb> findTasksByStatus(String status) {
+
+        status = prepareString(status);
+        List<TaskWeb> result = new ArrayList<>();
+
+        switch (status) {
+            case "started":
+                repository.findAllByStatus(STARTED).forEach(t -> result.add(convertToWeb(t)));
+                return result;
+            case "unstarted":
+                repository.findAllByStatus(UNSTARTED).forEach(t -> result.add(convertToWeb(t)));
+                return result;
+            case "done":
+                repository.findAllByStatus(DONE).forEach(t -> result.add(convertToWeb(t)));
+                return result;
+            default:
+                return result;
+        }
+    }
+
+    public List<Task> findTasksByText(String searchText) {
+        String preparedText = prepareString(searchText);
+
+        return repository.findAllByNameContains(preparedText);
+    }
+
+    public Optional<TaskWeb> updateTask(Long id, TaskWeb task) {
+        Optional<Task> repoTask = repository.findById(id);
+
+        if (repoTask.isPresent()) {
+            Task updatedTask = repoTask.get();
+
+            if (!isBlank(task.getName()))
                 updatedTask.setName(task.getName());
-            }
-            if (!StringUtils.isBlank(task.getStatus().toString())) {
+
+            if (!isBlank(task.getStatus().toString()))
                 updatedTask.setStatus(task.getStatus());
-            }
 
-            System.out.println(updatedTask);
-
-            return Optional.ofNullable(repository.save(updatedTask));
+            return Optional.ofNullable(convertToWeb(repository.save(updatedTask)));
         }
 
         return Optional.empty();
     }
 
-    public Optional<Task> findTask(Long id) {
-        return repository.findById(id);
-    }
+    public Optional<TaskWeb> deleteTask(Long id) {
+        Optional<Task> repoTask = repository.findById(id);
 
-    public void deleteTask(Long id){
+        if (repoTask.isPresent()) {
+            repository.deleteById(id);
 
-        repository.deleteById(id);
-    }
-
-    public List<Task> findTaskByStatus(String status){
-
-        status = checkString(status);
-
-        if(status.equals("started"))
-        {
-            return repository.findTaskByStatus(TaskStatus.STARTED);
+            return Optional.ofNullable(convertToWeb(repoTask.get()));
         }
 
-        else if(status.equals("unstarted"))
-        {
-            return repository.findTaskByStatus(TaskStatus.UNSTARTED);
-        }
-
-        else if(status.equals("done"))
-        {
-            return repository.findTaskByStatus(TaskStatus.DONE);
-        }
-
-        return new ArrayList<>();
-
+        return Optional.empty();
     }
 
-    public List<Task> findTaskByText(String searchText){
-        String result = checkString(searchText);
-        return repository.findAllByNameContains(result);
+    private String prepareString(String string) {
+        return string.trim().toLowerCase();
     }
 
-    public void deleteTaskById(Long id){
-        repository.deleteById(id);
+    private TaskWeb convertToWeb(Task task) {
+        return new TaskWeb(task.getId(), task.getName(), task.getStatus());
     }
-
-    public String checkString(String string){
-
-        String result = string;
-
-        result = result.trim();
-        result = result.toLowerCase();
-
-        return result;
-
-
-    }
-
 }

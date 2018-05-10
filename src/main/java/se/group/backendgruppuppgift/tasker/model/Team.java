@@ -15,7 +15,7 @@ public final class Team {
     @Column(nullable = false)
     private boolean isActive;
 
-    protected Team(){}
+    protected Team() {}
 
     public Team(String name, boolean isActive) {
         this.name = name;
@@ -30,28 +30,23 @@ public final class Team {
         return name;
     }
 
-    public void setIsActive(boolean isActive) {
-        this.isActive = isActive;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+    public boolean getIsActive() {
+        return isActive;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public boolean getIsActive() {
-        return isActive;
+    public void setIsActive(boolean active) {
+        isActive = active;
     }
 
     @Override
     public String toString() {
-        return "Team{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", isActive=" + isActive +
-                '}';
+        return String.format(
+                "Team[id=%d, name='%s', isActive=%s]",
+                id, name, isActive
+        );
     }
 }
