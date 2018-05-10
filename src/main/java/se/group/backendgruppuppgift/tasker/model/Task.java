@@ -45,10 +45,6 @@ public final class Task {
         return issue;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -68,8 +64,8 @@ public final class Task {
     @Override
     public String toString() {
         return String.format(
-                "User[id=%d, name='%s', status='%s'",
-                id, name, status
+                "Task[id=%d, name='%s', status='%s', user=%s, issue=%s]",
+                id, name, status, user, issue
         );
     }
 }

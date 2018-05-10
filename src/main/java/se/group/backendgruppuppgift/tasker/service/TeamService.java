@@ -25,26 +25,26 @@ public final class TeamService {
         return teamRepository.save(team);
     }
 
-    public Team updateTeam(Team team){
+    public Team updateTeam(Team team) {
         return teamRepository.save(team);
     }
 
-    public Optional<Team> deleteTeam(Long id){
+    public Optional<Team> deleteTeam(Long id) {
         Optional<Team> team = teamRepository.findById(id);
         teamRepository.deleteById(id);
 
         return team;
     }
 
-    public Optional<Team> getTeam(Long id){
+    public Optional<Team> findTeam(Long id) {
         return teamRepository.findById(id);
     }
 
-    public Iterable<Team> getAllTeams(){
+    public List<Team> getAllTeams() {
         return teamRepository.findAll();
     }
 
-    public void addUserToTeam(Team team, User user){
+    public void addUserToTeam(Team team, User user) {
         userTeamValidation(user);
         maxUserLimitValidation(team);
 
@@ -57,18 +57,19 @@ public final class TeamService {
     }
 
     private void maxUserLimitValidation(Team team) {
-           List<User> users = userRepository.findByTeam(team);
-                if(users.size()  >= 10){
-                    throw new InvalidTeamException("Team: "+ team.getName() + " is full, max 10 users in a team");
-                }
-    }
+        List<User> users = userRepository.findByTeam(team);
 
-    private void userTeamValidation(User user){
-        if(user.getTeam().equals(null)){
-            return;
-        }else {
-            throw new InvalidTeamException("User: " + user.getUsername() + " is already in a Team");
+        if (users.size() >= 10) {
+            throw new InvalidTeamException("Team: " + team.getName() + " is full, max 10 users in a team");
         }
     }
 
+    private void userTeamValidation(User user) {
+        if (user.getTeam().equals(null)) {
+            // TODO: 2018-05-10 Returns nothing?
+            return;
+        } else {
+            throw new InvalidTeamException("User: " + user.getUsername() + " is already in a team");
+        }
+    }
 }

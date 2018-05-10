@@ -1,16 +1,16 @@
 package se.group.backendgruppuppgift.tasker.service;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import se.group.backendgruppuppgift.tasker.model.Task;
-import se.group.backendgruppuppgift.tasker.model.TaskStatus;
 import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
 import se.group.backendgruppuppgift.tasker.repository.TaskRepository;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static se.group.backendgruppuppgift.tasker.model.TaskStatus.*;
 
 @Service
 public final class TaskService {
@@ -21,74 +21,75 @@ public final class TaskService {
         this.repository = repository;
     }
 
+    public TaskWeb createTask(TaskWeb task) {
+        Task repoTask = repository.save(new Task(task.getName(), task.getStatus()));
 
-    public Task createTask(TaskWeb task) {
-        System.out.println(task); // TODO: 2018-05-09 Remove in final stage of development
-        return repository.save(new Task(task.getName(), task.getStatus()));
+        return convertToWeb(repoTask);
     }
 
-    public Optional<Task> updateTask(Long id, TaskWeb task) {
+    public Optional<TaskWeb> findTask(Long id) {
+        Task repoTask = repository.findById(id).get();
+
+        return Optional.of(convertToWeb(repoTask));
+    }
+
+    public List<TaskWeb> findTaskByStatus(String status) {
+
+        status = prepareString(status);
+        List<TaskWeb> result = new ArrayList<>();
+
+        switch (status) {
+            case "started":
+                repository.findByStatus(STARTED).forEach(t -> result.add(convertToWeb(t)));
+                return result;
+            case "unstarted":
+                repository.findByStatus(UNSTARTED).forEach(t -> result.add(convertToWeb(t)));
+                return result;
+            case "done":
+                repository.findByStatus(DONE).forEach(t -> result.add(convertToWeb(t)));
+                return result;
+            default:
+                return result;
+        }
+    }
+
+    public Optional<TaskWeb> updateTask(Long id, TaskWeb task) {
         Optional<Task> result = repository.findById(id);
-        System.out.println(task);
+
         if (result.isPresent()) {
             Task updatedTask = result.get();
 
-            if (!StringUtils.isBlank(task.getName())) {
+            if (!isBlank(task.getName()))
                 updatedTask.setName(task.getName());
-            }
-            if (!StringUtils.isBlank(task.getStatus().toString())) {
+
+            if (!isBlank(task.getStatus().toString()))
                 updatedTask.setStatus(task.getStatus());
-            }
 
-            System.out.println(updatedTask);
-
-            return Optional.ofNullable(repository.save(updatedTask));
+            return Optional.ofNullable(convertToWeb(repository.save(updatedTask)));
         }
 
         return Optional.empty();
     }
 
-    public Optional<Task> findTask(Long id) {
-        return repository.findById(id);
-    }
+    public Optional<TaskWeb> deleteTask(Long id) {
+        Optional<Task> repoTask = repository.findById(id);
+        Optional<TaskWeb> result;
 
-    public void deleteTask(Long id){
+        if (repoTask.isPresent()) {
+            repository.deleteById(id);
+            result = Optional.ofNullable(convertToWeb(repoTask.get()));
 
-        repository.deleteById(id);
-    }
-
-    public List<Task> findTaskByStatus(String status){
-
-        status = checkString(status);
-
-        if(status.equals("started"))
-        {
-            return repository.findByStatus(TaskStatus.STARTED);
+            return result;
         }
 
-        else if(status.equals("unstarted"))
-        {
-            return repository.findByStatus(TaskStatus.UNSTARTED);
-        }
-
-        else if(status.equals("done"))
-        {
-            return repository.findByStatus(TaskStatus.DONE);
-        }
-
-        return new ArrayList<>();
-
+        return Optional.empty();
     }
 
-    public String checkString(String string){
+    private String prepareString(String string) {
+        return string.trim().toLowerCase();
+    }
 
-        String result = string;
-
-        result = result.trim();
-        result = result.toLowerCase();
-
-        return result;
-
-
+    private TaskWeb convertToWeb(Task task) {
+        return new TaskWeb(task.getId(), task.getName(), task.getStatus());
     }
 }

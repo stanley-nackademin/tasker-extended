@@ -1,8 +1,6 @@
 package se.group.backendgruppuppgift.tasker.resource;
 
 import org.springframework.stereotype.Component;
-import se.group.backendgruppuppgift.tasker.model.Task;
-import se.group.backendgruppuppgift.tasker.model.TaskStatus;
 import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
 import se.group.backendgruppuppgift.tasker.service.TaskService;
 
@@ -14,7 +12,7 @@ import java.net.URI;
 import java.util.List;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.Response.Status.*;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 @Component
 @Consumes(APPLICATION_JSON)
@@ -33,11 +31,26 @@ public final class TaskResource {
 
     @POST
     public Response createTask(TaskWeb task) {
-        Task result = service.createTask(task);
+        TaskWeb result = service.createTask(task);
+
         return Response.created(URI.create(uriInfo
                 .getAbsolutePathBuilder()
                 .path(result.getId().toString())
                 .toString()))
+                .build();
+    }
+
+    @GET
+    public List<TaskWeb> findTaskByStatus(@QueryParam("status") String status){
+        return service.findTaskByStatus(status);
+    }
+
+    @GET
+    @Path("{id}")
+    public Response findTask(@PathParam("id") Long id) {
+        return service.findTask(id)
+                .map(Response::ok)
+                .orElse(Response.status(NOT_FOUND))
                 .build();
     }
 
@@ -50,19 +63,12 @@ public final class TaskResource {
                 .build();
     }
 
-    @GET
+    @DELETE
     @Path("{id}")
-    public Response findTask(@PathParam("id") Long id) {
-        return service.findTask(id)
-                .map(Response::ok)
+    public Response deleteTask(@PathParam("id") Long id) {
+        return service.deleteTask(id)
+                .map(t -> Response.noContent())
                 .orElse(Response.status(NOT_FOUND))
                 .build();
     }
-
-    @GET
-    public List<Task> findTaskByStatus(@QueryParam("status") String status){
-        return service.findTaskByStatus(status);
-    }
-
-
 }
