@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.apache.commons.lang3.StringUtils.isAllBlank;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static se.group.backendgruppuppgift.tasker.model.TaskStatus.*;
 
@@ -22,7 +23,7 @@ public final class TaskService {
     }
 
     public TaskWeb createTask(TaskWeb task) {
-        Task repoTask = repository.save(new Task(task.getName(), task.getStatus()));
+        Task repoTask = repository.save(new Task(task.getDescription(), task.getStatus()));
 
         return convertToWeb(repoTask);
     }
@@ -36,30 +37,23 @@ public final class TaskService {
         return Optional.empty();
     }
 
-    public List<TaskWeb> findTasksByStatus(String status) {
-
-        status = prepareString(status);
+    public List<TaskWeb> findTasksByParams(String status, String team, String user, String text) {
         List<TaskWeb> result = new ArrayList<>();
 
-        switch (status) {
-            case "started":
-                repository.findAllByStatus(STARTED).forEach(t -> result.add(convertToWeb(t)));
-                return result;
-            case "unstarted":
-                repository.findAllByStatus(UNSTARTED).forEach(t -> result.add(convertToWeb(t)));
-                return result;
-            case "done":
-                repository.findAllByStatus(DONE).forEach(t -> result.add(convertToWeb(t)));
-                return result;
-            default:
-                return result;
+        if (!isBlank(status) && isAllBlank(team, user, text)) {
+            return findTasksByStatus(status);
+        } else if (!isBlank(team) && isAllBlank(status, user, text)) {
+
+        } else if (!isBlank(user) && isAllBlank(status, team, text)) {
+            // TODO: 2018-05-11 Change to username
+            repository.findByUserId(Long.parseLong(user)).forEach(t -> result.add(convertToWeb(t)));
+        } else if (!isBlank(text) && isAllBlank(status, team, user)) {
+            repository.findByDescriptionContains(text).forEach(t -> result.add(convertToWeb(t)));
+        } else {
+            repository.findAll().forEach(t -> result.add(convertToWeb(t)));
         }
-    }
 
-    public List<Task> findTasksByText(String searchText) {
-        String preparedText = prepareString(searchText);
-
-        return repository.findAllByNameContains(preparedText);
+        return result;
     }
 
     public Optional<TaskWeb> updateTask(Long id, TaskWeb task) {
@@ -68,8 +62,8 @@ public final class TaskService {
         if (repoTask.isPresent()) {
             Task updatedTask = repoTask.get();
 
-            if (!isBlank(task.getName()))
-                updatedTask.setName(task.getName());
+            if (!isBlank(task.getDescription()))
+                updatedTask.setDescription(task.getDescription());
 
             if (!isBlank(task.getStatus().toString()))
                 updatedTask.setStatus(task.getStatus());
@@ -92,11 +86,31 @@ public final class TaskService {
         return Optional.empty();
     }
 
+    private List<TaskWeb> findTasksByStatus(String status) {
+
+        status = prepareString(status);
+        List<TaskWeb> result = new ArrayList<>();
+
+        switch (status) {
+            case "started":
+                repository.findByStatus(STARTED).forEach(t -> result.add(convertToWeb(t)));
+                return result;
+            case "unstarted":
+                repository.findByStatus(UNSTARTED).forEach(t -> result.add(convertToWeb(t)));
+                return result;
+            case "done":
+                repository.findByStatus(DONE).forEach(t -> result.add(convertToWeb(t)));
+                return result;
+            default:
+                return result;
+        }
+    }
+
     private String prepareString(String string) {
         return string.trim().toLowerCase();
     }
 
     private TaskWeb convertToWeb(Task task) {
-        return new TaskWeb(task.getId(), task.getName(), task.getStatus());
+        return new TaskWeb(task.getId(), task.getDescription(), task.getStatus());
     }
 }

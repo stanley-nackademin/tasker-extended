@@ -41,11 +41,6 @@ public final class TaskResource {
     }
 
     @GET
-    public List<TaskWeb> findTasksByStatus(@QueryParam("status") String status) {
-        return service.findTasksByStatus(status);
-    }
-
-    @GET
     @Path("{id}")
     public Response findTask(@PathParam("id") Long id) {
         return service.findTask(id)
@@ -55,15 +50,13 @@ public final class TaskResource {
     }
 
     @GET
-    public Response findTasksByParameter(@QueryParam("status") @DefaultValue("") String status, @QueryParam("text") @DefaultValue("") String text) {
-// TODO: 2018-05-10 Business logic should be in service layer
-        if (!status.isEmpty()) {
-            return Response.ok(service.findTasksByStatus(status)).build();
-        } else if (!text.isEmpty()) {
-            return Response.ok(service.findTasksByText(text)).build();
-        }
+    public List<TaskWeb> findTasksByParams(
+            @QueryParam("status") String status,
+            @QueryParam("team") String team,
+            @QueryParam("user") String user,
+            @QueryParam("text") String text) {
 
-        return Response.status(NOT_FOUND).build();
+        return service.findTasksByParams(status, team, user, text);
     }
 
     @PUT

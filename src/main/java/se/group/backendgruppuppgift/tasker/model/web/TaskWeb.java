@@ -5,14 +5,14 @@ import se.group.backendgruppuppgift.tasker.model.TaskStatus;
 public final class TaskWeb {
 
     private Long id;
-    private String name;
+    private String description;
     private TaskStatus status;
 
     protected TaskWeb() {}
 
-    public TaskWeb(Long id, String name, TaskStatus status) {
+    public TaskWeb(Long id, String description, TaskStatus status) {
         this.id = id;
-        this.name = name;
+        this.description = description;
         this.status = status;
     }
 
@@ -20,8 +20,8 @@ public final class TaskWeb {
         return id;
     }
 
-    public String getName() {
-        return name;
+    public String getDescription() {
+        return description;
     }
 
     public TaskStatus getStatus() {
@@ -31,8 +31,8 @@ public final class TaskWeb {
     @Override
     public String toString() {
         return String.format(
-                "TaskWeb[id=%d, name='%s', status='%s']",
-                id, name, status
+                "TaskWeb[id=%d, description='%s', status='%s']",
+                id, description, status
         );
     }
 }

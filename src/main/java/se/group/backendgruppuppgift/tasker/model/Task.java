@@ -10,7 +10,7 @@ public final class Task {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private String description;
 
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
@@ -24,8 +24,8 @@ public final class Task {
 
     protected Task() {}
 
-    public Task(String name, TaskStatus status) {
-        this.name = name;
+    public Task(String description, TaskStatus status) {
+        this.description = description;
         this.status = status;
     }
 
@@ -33,8 +33,8 @@ public final class Task {
         return id;
     }
 
-    public String getName() {
-        return name;
+    public String getDescription() {
+        return description;
     }
 
     public TaskStatus getStatus() {
@@ -45,8 +45,8 @@ public final class Task {
         return issue;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public void setStatus(TaskStatus status) {
@@ -64,8 +64,8 @@ public final class Task {
     @Override
     public String toString() {
         return String.format(
-                "Task[id=%d, name='%s', status='%s', user=%s, issue=%s]",
-                id, name, status, user, issue
+                "Task[id=%d, description='%s', status='%s', user=%s, issue=%s]",
+                id, description, status, user, issue
         );
     }
 }

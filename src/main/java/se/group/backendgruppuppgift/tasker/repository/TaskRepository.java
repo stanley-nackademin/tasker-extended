@@ -10,9 +10,12 @@ import java.util.List;
 @Repository
 public interface TaskRepository extends CrudRepository<Task, Long> {
 
-    List<Task> findAllByStatus(TaskStatus status);
+    List<Task> findByStatus(TaskStatus status);
 
-    List<Task> findAllByNameContains(String name);
+    List<Task> findByUserId(Long id);
 
-    //List<Task> findAllByIssueExists(); // TODO: 2018-05-09 Unsupported keyword 'EXISTS', returns boolean
+    List<Task> findByDescriptionContains(String text);
+
+    @Override
+    List<Task> findAll();
 }
