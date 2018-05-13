@@ -4,13 +4,13 @@ import org.springframework.stereotype.Service;
 import se.group.backendgruppuppgift.tasker.model.Task;
 import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
 import se.group.backendgruppuppgift.tasker.repository.TaskRepository;
+import se.group.backendgruppuppgift.tasker.service.exception.InvalidTaskException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.apache.commons.lang3.StringUtils.isAllBlank;
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 import static se.group.backendgruppuppgift.tasker.model.TaskStatus.*;
 
 @Service
@@ -23,6 +23,7 @@ public final class TaskService {
     }
 
     public TaskWeb createTask(TaskWeb task) {
+        validateTask(task);
         Task repoTask = repository.save(new Task(task.getDescription(), task.getStatus()));
 
         return convertToWeb(repoTask);
@@ -41,7 +42,7 @@ public final class TaskService {
         List<TaskWeb> result = new ArrayList<>();
 
         if (!isBlank(status) && isAllBlank(team, user, text)) {
-            return findTasksByStatus(status);
+            findTasksByStatus(status).forEach(t -> result.add(convertToWeb(t)));
         } else if (!isBlank(team) && isAllBlank(status, user, text)) {
 
         } else if (!isBlank(user) && isAllBlank(status, team, text)) {
@@ -57,6 +58,7 @@ public final class TaskService {
     }
 
     public Optional<TaskWeb> updateTask(Long id, TaskWeb task) {
+        validateTask(task);
         Optional<Task> repoTask = repository.findById(id);
 
         if (repoTask.isPresent()) {
@@ -86,23 +88,19 @@ public final class TaskService {
         return Optional.empty();
     }
 
-    private List<TaskWeb> findTasksByStatus(String status) {
+    private List<Task> findTasksByStatus(String status) {
 
         status = prepareString(status);
-        List<TaskWeb> result = new ArrayList<>();
 
         switch (status) {
             case "started":
-                repository.findByStatus(STARTED).forEach(t -> result.add(convertToWeb(t)));
-                return result;
+                return repository.findByStatus(STARTED);
             case "unstarted":
-                repository.findByStatus(UNSTARTED).forEach(t -> result.add(convertToWeb(t)));
-                return result;
+                return repository.findByStatus(UNSTARTED);
             case "done":
-                repository.findByStatus(DONE).forEach(t -> result.add(convertToWeb(t)));
-                return result;
+                return repository.findByStatus(DONE);
             default:
-                return result;
+                return new ArrayList<>();
         }
     }
 
@@ -112,5 +110,10 @@ public final class TaskService {
 
     private TaskWeb convertToWeb(Task task) {
         return new TaskWeb(task.getId(), task.getDescription(), task.getStatus());
+    }
+
+    private void validateTask(TaskWeb task) {
+        if (task.getStatus() == null || isBlank(task.getDescription()))
+            throw new InvalidTaskException("Missing/invalid values");
     }
 }
