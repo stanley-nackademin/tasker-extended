@@ -3,7 +3,7 @@ package se.group.backendgruppuppgift.tasker.resource;
 import org.springframework.stereotype.Component;
 import se.group.backendgruppuppgift.tasker.model.Team;
 import se.group.backendgruppuppgift.tasker.model.web.TeamWeb;
-import se.group.backendgruppuppgift.tasker.service.TeamService;
+import se.group.backendgruppuppgift.tasker.service.MasterService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -25,15 +25,15 @@ public final class TeamResource {
     @Context
     private UriInfo uriInfo;
 
-    private final TeamService service;
+    private final MasterService service;
 
-    public TeamResource(TeamService service) {
+    public TeamResource(MasterService service) {
         this.service = service;
     }
 
     @POST
     public Response createTeam(TeamWeb teamWeb) {
-        TeamWeb result = service.createTeam(teamWeb);
+        TeamWeb result = service.getTeamService().createTeam(teamWeb);
 
         return Response.created(URI.create(uriInfo
                 .getAbsolutePathBuilder()
@@ -46,13 +46,13 @@ public final class TeamResource {
 
     @GET
     public List<Team> getAllTeams() {
-        return service.getAllTeams();
+        return service.getTeamService().getAllTeams();
     }
 
     @GET
     @Path("{id}")
     public Response findTeam(@PathParam("id") Long id) {
-        return service.findTeam(id)
+        return service.getTeamService().findTeam(id)
                 .map(Response::ok)
                 .orElse(Response.status(NOT_FOUND))
                 .build();
@@ -61,7 +61,7 @@ public final class TeamResource {
     @PUT
     @Path("{id}")
     public Response updateTeam(@PathParam("id") Long id, TeamWeb team) {
-        return service.updateTeam(id, team)
+        return service.getTeamService().updateTeam(id, team)
                 .map(Response::ok)
                 .orElse(Response.status(NOT_FOUND))
                 .build();
@@ -70,7 +70,7 @@ public final class TeamResource {
     @DELETE
     @Path("{id}")
     public Response deleteTeam(@PathParam("id") Long id) {
-        return service.deleteTeam(id)
+        return service.getTeamService().deleteTeam(id)
                 .map(todo -> Response.status(NO_CONTENT))
                 .orElse(Response.status(NOT_FOUND))
                 .build();

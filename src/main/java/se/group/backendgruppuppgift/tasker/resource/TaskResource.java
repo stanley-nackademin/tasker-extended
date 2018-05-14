@@ -2,7 +2,7 @@ package se.group.backendgruppuppgift.tasker.resource;
 
 import org.springframework.stereotype.Component;
 import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
-import se.group.backendgruppuppgift.tasker.service.TaskService;
+import se.group.backendgruppuppgift.tasker.service.MasterService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -23,15 +23,15 @@ public final class TaskResource {
     @Context
     private UriInfo uriInfo;
 
-    private final TaskService service;
+    private final MasterService service;
 
-    public TaskResource(TaskService service) {
+    public TaskResource(MasterService service) {
         this.service = service;
     }
 
     @POST
     public Response createTask(TaskWeb task) {
-        TaskWeb result = service.createTask(task);
+        TaskWeb result = service.getTaskService().createTask(task);
 
         return Response.created(URI.create(uriInfo
                 .getAbsolutePathBuilder()
@@ -43,7 +43,7 @@ public final class TaskResource {
     @GET
     @Path("{id}")
     public Response findTask(@PathParam("id") Long id) {
-        return service.findTask(id)
+        return service.getTaskService().findTask(id)
                 .map(Response::ok)
                 .orElse(Response.status(NOT_FOUND))
                 .build();
@@ -56,13 +56,13 @@ public final class TaskResource {
             @QueryParam("user") String user,
             @QueryParam("text") String text) {
 
-        return service.findTasksByParams(status, team, user, text);
+        return service.getTaskService().findTasksByParams(status, team, user, text);
     }
 
     @PUT
     @Path("{id}")
     public Response updateTask(@PathParam("id") Long id, TaskWeb task) {
-        return service.updateTask(id, task)
+        return service.getTaskService().updateTask(id, task)
                 .map(Response::ok)
                 .orElse(Response.status(NOT_FOUND))
                 .build();
@@ -71,7 +71,7 @@ public final class TaskResource {
     @DELETE
     @Path("{id}")
     public Response deleteTask(@PathParam("id") Long id) {
-        return service.deleteTask(id)
+        return service.getTaskService().deleteTask(id)
                 .map(t -> Response.noContent())
                 .orElse(Response.status(NOT_FOUND))
                 .build();
