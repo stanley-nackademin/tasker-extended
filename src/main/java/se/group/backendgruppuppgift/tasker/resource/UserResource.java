@@ -82,9 +82,9 @@ public final class UserResource {
 
     //TODO ------------------------DENNA ÄR INTE KLAR.
     @PUT
-    @PathParam("{userNumber}/tasks")
-    public Response updateUserTask(@PathParam("userNumber") Long userNumber, TaskWeb task){
-        return service.updateUserTask(userNumber,task)
+    @Path("{usernumber}/tasks/{taskid}")
+    public Response updateUserTask(@PathParam("usernumber") Long userNumber,@PathParam("taskid") Long taskId){
+        return service.updateUserTask(userNumber,taskId)
                 .map(Response::ok)
                 .orElse(Response.status(NOT_FOUND))
                 .build();

@@ -68,24 +68,15 @@ public final class UserService {
     }
 
     // -------------------------------TODO DENNA ÄR INTE KLAR.
-    public Optional<TaskWeb> updateUserTask(Long userNumber, TaskWeb task){
+    public Optional<TaskWeb> updateUserTask(Long userNumber, Long taskId){
         Optional<User> userResult = repository.findByUserNumber(userNumber);
-        Optional<Task> taskResult = taskRepository.findById(task.getId());
+        Optional<Task> taskResult = taskRepository.findById(taskId);
 
         if(taskResult.isPresent()){
-            Task updatedTask = taskResult.get();
-            User updatedUser = userResult.get();
-
-            if(updatedTask.getDescription() == null){
-                updatedTask.setDescription(taskResult.get().getDescription());
-            }
-            if(updatedTask.getStatus() == null){
-                updatedTask.setStatus(taskResult.get().getStatus());
-            }
-
-            updatedTask.setUser(updatedUser);
-            return Optional.ofNullable(convertTaskToWeb(taskRepository.save(updatedTask)));
-
+           Task updatedTask = taskResult.get();
+           User updatedUser = userResult.get();
+           updatedTask.setUser(updatedUser);
+           return Optional.ofNullable(convertTaskToWeb(taskRepository.save(updatedTask)));
         }
         return Optional.empty();
     }
