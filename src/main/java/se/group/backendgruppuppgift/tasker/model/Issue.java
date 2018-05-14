@@ -12,14 +12,18 @@ public final class Issue {
     @Column(nullable = false)
     private String description;
 
-    @OneToOne
-    @JoinColumn
-    private Task task;
-
     @Column(nullable = false)
     private boolean isDone;
 
+    @OneToOne(mappedBy = "issue")
+    private Task task;
+
     protected Issue() {}
+
+    public Issue(String description) {
+        this.description = description;
+        this.isDone = false;
+    }
 
     public Issue(String description, Task task) {
         this.description = description;
@@ -39,7 +43,23 @@ public final class Issue {
         return task;
     }
 
-    public boolean isDone() {
+    public boolean getIsDone() {
         return isDone;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setIsDone(boolean done) {
+        isDone = done;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "Issue[id=%d, description='%s', isDone='%s', task=%s]",
+                id, description, isDone, task
+        );
     }
 }

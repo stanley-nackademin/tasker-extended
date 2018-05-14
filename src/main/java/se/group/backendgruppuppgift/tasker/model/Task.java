@@ -10,7 +10,7 @@ public final class Task {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private String description;
 
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
@@ -18,14 +18,15 @@ public final class Task {
     @ManyToOne
     private User user;
 
-    @OneToOne
-    @JoinColumn
+    @OneToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(unique = true)
     private Issue issue;
-
+@OneToOne(mappedBy = "issue")
+    private Task task;
     protected Task() {}
 
-    public Task(String name, TaskStatus status) {
-        this.name = name;
+    public Task(String description, TaskStatus status) {
+        this.description = description;
         this.status = status;
     }
 
@@ -33,8 +34,8 @@ public final class Task {
         return id;
     }
 
-    public String getName() {
-        return name;
+    public String getDescription() {
+        return description;
     }
 
     public TaskStatus getStatus() {
@@ -43,5 +44,29 @@ public final class Task {
 
     public Issue getIssue() {
         return issue;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setStatus(TaskStatus status) {
+        this.status = status;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setIssue(Issue issue) {
+        this.issue = issue;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "Task[id=%d, description='%s', status='%s', user=%s, issue=%s]",
+                id, description, status, user, issue
+        );
     }
 }
