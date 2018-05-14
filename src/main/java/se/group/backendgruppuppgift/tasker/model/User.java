@@ -14,7 +14,7 @@ public final class User {
     private Long userNumber;
 
     @Column(nullable = false, unique = true)
-    private String username;
+    private String userName;
 
     @Column(nullable = false)
     private String firstName;
@@ -34,9 +34,9 @@ public final class User {
 
     protected User() {}
 
-    public User(Long userNumber, String username, String firstName, String lastName, Team team) {
+    public User(Long userNumber, String userName, String firstName, String lastName, Team team) {
         this.userNumber = userNumber;
-        this.username = username;
+        this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.active = true;
@@ -51,8 +51,8 @@ public final class User {
         return userNumber;
     }
 
-    public String getUsername() {
-        return username;
+    public String getUserName() {
+        return userName;
     }
 
     public String getFirstName() {
@@ -81,6 +81,38 @@ public final class User {
 
     public void removeTask(Task task) {
         tasks.remove(task);
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setUserNumber(Long userNumber) {
+        this.userNumber = userNumber;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
+    }
+
+    public void setTasks(Collection<Task> tasks) {
+        this.tasks = tasks;
     }
 
     @Override

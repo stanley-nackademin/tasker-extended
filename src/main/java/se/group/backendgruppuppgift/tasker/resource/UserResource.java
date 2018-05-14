@@ -1,7 +1,9 @@
 package se.group.backendgruppuppgift.tasker.resource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import se.group.backendgruppuppgift.tasker.model.User;
+import se.group.backendgruppuppgift.tasker.model.web.UserWeb;
 import se.group.backendgruppuppgift.tasker.service.UserService;
 
 import javax.ws.rs.*;
@@ -24,19 +26,22 @@ public final class UserResource {
     @Context
     private UriInfo uriInfo;
 
-    private final UserService service;
+    @Autowired
+    private UserService service;
 
-    public UserResource(UserService service) {
-        this.service = service;
-    }
+//    private final UserService service;
+
+//    public UserResource(UserService service) {
+//        this.service = service;
+//    }
 
     @POST
-    public Response createUser(User user) {
-        User result = service.createUser(user);
+    public Response createUser(UserWeb user) {
+        UserWeb result = service.createUser(user);
 
         return Response.created(URI.create(uriInfo
                 .getAbsolutePathBuilder()
-                .path(result.getId().toString())
+                .path(result.getUserNumber().toString())
                 .toString()))
                 .build();
     }
@@ -44,7 +49,7 @@ public final class UserResource {
     @DELETE
     @Path("{userNumber}")
     public Response deleteUserByUserNumber(@PathParam ("userNumber") Long userNumber){
-        Optional<User> result = service.deleteUserByUserNumber(userNumber);
+        Optional<UserWeb> result = service.deleteUserByUserNumber(userNumber);
         return result.map(r -> Response.status(NO_CONTENT)).orElse(Response.status(NOT_FOUND)).build();
     }
 

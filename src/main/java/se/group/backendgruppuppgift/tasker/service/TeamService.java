@@ -66,7 +66,7 @@ public final class TeamService {
         if(user.getTeam().equals(null)){
             return;
         }else {
-            throw new InvalidTeamException("User: " + user.getUsername() + " is already in a Team");
+            throw new InvalidTeamException("User: " + user.getUserName() + " is already in a Team");
         }
     }
 

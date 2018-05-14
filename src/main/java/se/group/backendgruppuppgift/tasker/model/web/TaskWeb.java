@@ -4,6 +4,8 @@ import se.group.backendgruppuppgift.tasker.model.TaskStatus;
 
 public final class TaskWeb {
 
+
+    private Long taskNumber;
     private String name;
     private TaskStatus status;
 

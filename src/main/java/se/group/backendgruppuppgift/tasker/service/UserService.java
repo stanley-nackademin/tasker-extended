@@ -2,10 +2,12 @@ package se.group.backendgruppuppgift.tasker.service;
 
 import org.springframework.stereotype.Service;
 import se.group.backendgruppuppgift.tasker.model.User;
+import se.group.backendgruppuppgift.tasker.model.web.UserWeb;
 import se.group.backendgruppuppgift.tasker.repository.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public final class UserService {
@@ -18,20 +20,42 @@ public final class UserService {
         this.repository = repository;
     }
 
-    public User createUser(User user) {
-        return repository.save(user);
+    public UserWeb createUser(UserWeb user) {
+        Long userNumber;
+        try{
+            userNumber = repository.findFirstByOrderByUserNumberDesc().getUserNumber();
+        }catch (NullPointerException e){
+            userNumber = 1000L;
+        }
+
+        AtomicLong number = new AtomicLong(userNumber);
+        userNumber = number.incrementAndGet();
+
+        UserWeb userWeb = new UserWeb(userNumber, user.getUserName() ,user.getFirstName(), user.getLastName());
+        User entityUser = new User(userWeb.getUserNumber(), userWeb.getUserName(), userWeb.getFirstName(), userWeb.getLastName(), null);
+        repository.save(entityUser);
+        return userWeb;
     }
 
-    public Optional<User> findUserByUserNumber(Long userNumber){
-        return repository.findUserByUserNumber(userNumber);
+    public Optional<UserWeb> findUserByUserNumber(Long userNumber){
+        Optional<User> user = repository.findUserByUserNumber(userNumber);
+        if(user.isPresent()){
+            User user2 = user.get();
+            return UserWeb.getOptionalFromUser(user2);
+        }
+        return Optional.empty();
     }
 
-    public Optional<User> deleteUserByUserNumber(Long userNumber){
-        Optional<User> user = findUserByUserNumber(userNumber);
+    public Optional<UserWeb> deleteUserByUserNumber(Long userNumber){
+        Optional<UserWeb> user = findUserByUserNumber(userNumber);
         if(user.isPresent()){
             repository.removeByUserNumber(userNumber);
         }
         return user;
+    }
+
+    public User findLastUser(){
+        return repository.findFirstByOrderByUserNumberDesc();
     }
 
     public List<User> findUsersByTeamId(Long teamId){
@@ -49,15 +73,15 @@ public final class UserService {
         }else if(firstName.isEmpty() && !lastName.isEmpty() && userName.isEmpty()){ // om allt är null förutom lastname
             return repository.findUsersByLastName(lastName);
         }else if(firstName.isEmpty() && lastName.isEmpty() && !userName.isEmpty()){ // om allt är null förutom username
-            return repository.findUsersByUsername(userName);
+            return repository.findUsersByUserName(userName);
         }else if (!firstName.isEmpty() && !lastName.isEmpty() && userName.isEmpty()){ // om allt är null förutom firsntame och lastname
             return repository.findUsersByFirstNameAndLastName(firstName,lastName);
         }else if (!firstName.isEmpty() && lastName.isEmpty() && !userName.isEmpty()){ // om allt är null förutom firstNAme och username
-            return repository.findUsersByFirstNameAndUsername(firstName,userName);
+            return repository.findUsersByFirstNameAndUserName(firstName,userName);
         }else if(firstName.isEmpty() && !lastName.isEmpty() && !userName.isEmpty()){ // om firstname är null
-            return repository.findUsersByUsernameAndLastName(userName, lastName);
+            return repository.findUsersByUserNameAndLastName(userName, lastName);
         }else
-            {return repository.findUsersByFirstNameAndLastNameAndUsername(firstName, lastName, userName);
+            {return repository.findUsersByFirstNameAndLastNameAndUserName(firstName, lastName, userName);
         }
     }
 }

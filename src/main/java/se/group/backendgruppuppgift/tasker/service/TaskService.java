@@ -28,11 +28,11 @@ public final class TaskService {
 
     public Optional<Task> updateTask(Long id, TaskWeb task) {
         Optional<Task> result = repository.findById(id);
-        System.out.println(task);
+        System.out.println(task); //TODO: ta bort sen
         if (result.isPresent()) {
             Task updatedTask = result.get();
 
-            if (!StringUtils.isBlank(task.getName())) {
+            if (!StringUtils.isBlank(task.getName())) { //bra grjejor
                 updatedTask.setName(task.getName());
             }
             if (!StringUtils.isBlank(task.getStatus().toString())) {

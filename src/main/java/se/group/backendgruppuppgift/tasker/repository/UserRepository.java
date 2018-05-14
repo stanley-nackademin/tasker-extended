@@ -21,12 +21,14 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     //jonasmergeADD
     List<User> findUsersByTeam(Team team);
+//    User findFirstByOrderByIdDesc();
+    User findFirstByOrderByUserNumberDesc();
 
     List<User> findUsersByFirstName(String firstName);
-    List<User> findUsersByUsername(String userName);
+    List<User> findUsersByUserName(String userName);
     List<User> findUsersByLastName(String lastName);
     List<User> findUsersByFirstNameAndLastName(String firstName, String lastName);
-    List<User> findUsersByFirstNameAndUsername(String firstName, String userName);
-    List<User> findUsersByUsernameAndLastName(String userName, String lastName);
-    List<User> findUsersByFirstNameAndLastNameAndUsername(String firstName, String lastName, String userName);
+    List<User> findUsersByFirstNameAndUserName(String firstName, String userName);
+    List<User> findUsersByUserNameAndLastName(String userName, String lastName);
+    List<User> findUsersByFirstNameAndLastNameAndUserName(String firstName, String lastName, String userName);
 }
