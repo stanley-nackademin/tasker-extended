@@ -99,6 +99,10 @@ public final class User {
         this.team = team;
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     @Override
     public String toString() {
         return String.format(

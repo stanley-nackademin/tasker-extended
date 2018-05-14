@@ -1,9 +1,12 @@
 package se.group.backendgruppuppgift.tasker.resource;
 
 import org.springframework.stereotype.Component;
+import se.group.backendgruppuppgift.tasker.model.Task;
 import se.group.backendgruppuppgift.tasker.model.Team;
 import se.group.backendgruppuppgift.tasker.model.web.TeamWeb;
+import se.group.backendgruppuppgift.tasker.model.web.UserWeb;
 import se.group.backendgruppuppgift.tasker.service.TeamService;
+import se.group.backendgruppuppgift.tasker.service.UserService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -26,9 +29,11 @@ public final class TeamResource {
     private UriInfo uriInfo;
 
     private final TeamService service;
+    private final UserService userService;
 
-    public TeamResource(TeamService service) {
+    public TeamResource(TeamService service, UserService userService) {
         this.service = service;
+        this.userService = userService;
     }
 
     @POST
@@ -41,8 +46,6 @@ public final class TeamResource {
                 .toString()))
                 .build();
     }
-
-    //Todo: add user to team method
 
     @GET
     public List<Team> getAllTeams() {
@@ -71,7 +74,16 @@ public final class TeamResource {
     @Path("{id}")
     public Response deleteTeam(@PathParam("id") Long id) {
         return service.deleteTeam(id)
-                .map(todo -> Response.status(NO_CONTENT))
+                .map(team -> Response.status(NO_CONTENT))
+                .orElse(Response.status(NOT_FOUND))
+                .build();
+    }
+
+    @PUT
+    @Path("{id}/add")
+    public Response assignTeamToUser(@PathParam("id") Long id, UserWeb userWeb) {
+        return userService.addTeam(id, userWeb)
+                .map(Response::ok)
                 .orElse(Response.status(NOT_FOUND))
                 .build();
     }
