@@ -100,7 +100,7 @@ public final class User {
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        this.userName = username;
     }
 
     @Override

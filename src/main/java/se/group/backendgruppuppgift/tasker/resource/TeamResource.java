@@ -1,9 +1,13 @@
 package se.group.backendgruppuppgift.tasker.resource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import se.group.backendgruppuppgift.tasker.model.Team;
 import se.group.backendgruppuppgift.tasker.model.web.TeamWeb;
+import se.group.backendgruppuppgift.tasker.model.web.UserWeb;
 import se.group.backendgruppuppgift.tasker.service.MasterService;
+import se.group.backendgruppuppgift.tasker.service.TeamService;
+import se.group.backendgruppuppgift.tasker.service.UserService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -25,11 +29,8 @@ public final class TeamResource {
     @Context
     private UriInfo uriInfo;
 
-    private final MasterService service;
-
-    public TeamResource(MasterService service) {
-        this.service = service;
-    }
+    @Autowired
+    private MasterService service;
 
     @POST
     public Response createTeam(TeamWeb teamWeb) {
@@ -65,6 +66,13 @@ public final class TeamResource {
                 .map(Response::ok)
                 .orElse(Response.status(NOT_FOUND))
                 .build();
+    }
+
+    @PUT
+    @Path("{id}/add")
+    public Response assignTeamToUser(@PathParam("id") Long id, UserWeb userWeb){
+        UserService userService = service.getUserService();
+        return userService.addTeam(id, userWeb).map(teamWeb -> Response.status(NO_CONTENT)).orElse(Response.status(NOT_FOUND)).build();
     }
 
     @DELETE

@@ -42,7 +42,7 @@ public final class UserService {
         AtomicLong number = new AtomicLong(userNumber);
         userNumber = number.incrementAndGet();
 
-        UserWeb userWeb = new UserWeb(userNumber, user.getUserName() ,user.getFirstName(), user.getLastName());
+        UserWeb userWeb = new UserWeb(userNumber, user.getUserName() ,user.getFirstName(), user.getLastName(), user.getTeam());
         User entityUser = new User(userWeb.getUserNumber(), userWeb.getUserName(), userWeb.getFirstName(), userWeb.getLastName(), null);
         repository.save(entityUser);
         return userWeb;
@@ -127,7 +127,7 @@ public final class UserService {
     private void userTeamValidation(User user) {
 
         if (user.getTeam() != null) {
-            throw new InvalidTeamException("User: " + user.getUsername() + " is already in a team");
+            throw new InvalidTeamException("User: " + user.getUserName() + " is already in a team");
         }
 
     }

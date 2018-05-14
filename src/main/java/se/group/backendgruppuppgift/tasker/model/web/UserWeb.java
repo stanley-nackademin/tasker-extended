@@ -1,6 +1,6 @@
 package se.group.backendgruppuppgift.tasker.model.web;
 
-import se.group.backendgruppuppgift.tasker.model.Team;
+import se.group.backendgruppuppgift.tasker.model.*;
 
 import java.util.Optional;
 
@@ -16,7 +16,7 @@ public final class UserWeb {
     protected UserWeb() {
     }
 
-    public UserWeb(Long userNumber, String username, String firstName, String lastName, Team team) {
+    public UserWeb(Long userNumber, String userName, String firstName, String lastName, Team team) {
         this.userNumber = userNumber;
         this.userName = userName;
         this.firstName = firstName;
@@ -53,16 +53,16 @@ public final class UserWeb {
     public String toString() {
         return "UserWeb{" +
                 "userNumber=" + userNumber +
-                ", username='" + username + '\'' +
+                ", username='" + userName + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", isActive=" + isActive +
                 ", team=" + team +
                 '}';
-
+    }
 
     public static Optional<UserWeb> getOptionalFromUser(User user){
-        UserWeb userWeb = new UserWeb(user.getUserNumber(), user.getUserName(), user.getFirstName(), user.getLastName());
+        UserWeb userWeb = new UserWeb(user.getUserNumber(), user.getUserName(), user.getFirstName(), user.getLastName(), user.getTeam());
         return Optional.ofNullable(userWeb);
     }
 }
