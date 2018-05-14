@@ -17,11 +17,9 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public final class TeamService {
 
     private final TeamRepository teamRepository;
-    private final UserRepository userRepository;
 
-    public TeamService(TeamRepository teamRepository, UserRepository userRepository) {
+    public TeamService(TeamRepository teamRepository) {
         this.teamRepository = teamRepository;
-        this.userRepository = userRepository;
     }
 
     public TeamWeb createTeam(TeamWeb team) {
@@ -43,17 +41,6 @@ public final class TeamService {
         return teamRepository.findAll();
     }
 
-    public void addUserToTeam(Team team, User user) {
-        userTeamValidation(user);
-        maxUserLimitValidation(team);
-
-        //Todo: how to add team without setters???
-
-        Optional<User> optionalUser = userRepository.findByUserNumber(user.getUserNumber());
-        //optionalUser.get().setTeam(team);
-
-        userRepository.save(user);
-    }
 
     public Optional<TeamWeb> updateTeam(Long id, TeamWeb team) {
         Optional<Team> result = teamRepository.findById(id);
@@ -83,24 +70,6 @@ public final class TeamService {
         }
 
         return Optional.empty();
-    }
-
-    private void maxUserLimitValidation(Team team) {
-        List<User> users = userRepository.findByTeam(team);
-
-        if (users.size() >= 10) {
-            throw new InvalidTeamException("Team: " + team.getName() + " is full, max 10 users in a team");
-        }
-    }
-
-    private void userTeamValidation(User user) {
-
-        if (user.getTeam().equals(null)) {
-            // TODO: 2018-05-10 Returns nothing?
-            return;
-        } else {
-            throw new InvalidTeamException("User: " + user.getUsername() + " is already in a team");
-        }
     }
 
     private TeamWeb convertToWeb(Team team) {
