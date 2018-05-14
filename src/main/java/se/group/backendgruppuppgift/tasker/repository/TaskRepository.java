@@ -16,6 +16,10 @@ public interface TaskRepository extends CrudRepository<Task, Long> {
 
     List<Task> findByDescriptionContains(String text);
 
+    List<Task> findByIssueNotNull();
+
+    List<Task> findByIssueNull();
+
     @Override
     List<Task> findAll();
 }

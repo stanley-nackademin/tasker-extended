@@ -55,9 +55,10 @@ public final class TaskResource {
             @QueryParam("status") String status,
             @QueryParam("team") String team,
             @QueryParam("user") String user,
-            @QueryParam("text") String text) {
+            @QueryParam("text") String text,
+            @QueryParam("issue") String value) {
 
-        return service.getTaskService().findTasksByParams(status, team, user, text);
+        return service.getTaskService().findTasksByParams(status, team, user, text, value);
     }
 
     @PUT
