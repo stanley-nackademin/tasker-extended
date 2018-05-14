@@ -13,8 +13,8 @@ public final class User {
     @Column(nullable = false, unique = true)
     private Long userNumber;
 
-    @Column(nullable = false)
-    private String username;
+    @Column(nullable = false, unique = true)
+    private String userName;
 
     @Column(nullable = false)
     private String firstName;
@@ -25,18 +25,18 @@ public final class User {
     @Column(nullable = false)
     private boolean isActive;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
     private Team team;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private Collection<Task> tasks;
 
     protected User() {}
 
-    public User(Long userNumber, String username, String firstName, String lastName, Team team) {
+    public User(Long userNumber, String userName, String firstName, String lastName, Team team) {
         this.userNumber = userNumber;
-        this.username = username;
+        this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.isActive = true;
@@ -51,8 +51,8 @@ public final class User {
         return userNumber;
     }
 
-    public String getUsername() {
-        return username;
+    public String getUserName() {
+        return userName;
     }
 
     public String getFirstName() {
@@ -106,8 +106,8 @@ public final class User {
     @Override
     public String toString() {
         return String.format(
-                "User[id=%d, userNumber=%d, firstName='%s', lastName='%s', isActive=%s, team=%s, tasks=%s]",
-                id, userNumber, firstName, lastName, isActive, team, tasks
+                "User[id=%d, userNumber=%d, firstName='%s', lastName='%s', isActive=%s",
+                id, userNumber, firstName, lastName, isActive
         );
     }
 }

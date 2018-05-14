@@ -2,10 +2,12 @@ package se.group.backendgruppuppgift.tasker.model.web;
 
 import se.group.backendgruppuppgift.tasker.model.Team;
 
+import java.util.Optional;
+
 public final class UserWeb {
 
     private Long userNumber;
-    private String username;
+    private String userName;
     private String firstName;
     private String lastName;
     private Boolean isActive;
@@ -14,12 +16,12 @@ public final class UserWeb {
     protected UserWeb() {
     }
 
-    public UserWeb(Long userNumber, String username, String firstName, String lastName, Boolean isActive, Team team) {
+    public UserWeb(Long userNumber, String username, String firstName, String lastName, Team team) {
         this.userNumber = userNumber;
-        this.username = username;
+        this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.isActive = isActive;
+        this.isActive = true;
         this.team = team;
     }
 
@@ -27,8 +29,8 @@ public final class UserWeb {
         return userNumber;
     }
 
-    public String getUsername() {
-        return username;
+    public String getUserName() {
+        return userName;
     }
 
     public String getFirstName() {
@@ -57,5 +59,10 @@ public final class UserWeb {
                 ", isActive=" + isActive +
                 ", team=" + team +
                 '}';
+
+
+    public static Optional<UserWeb> getOptionalFromUser(User user){
+        UserWeb userWeb = new UserWeb(user.getUserNumber(), user.getUserName(), user.getFirstName(), user.getLastName());
+        return Optional.ofNullable(userWeb);
     }
 }
