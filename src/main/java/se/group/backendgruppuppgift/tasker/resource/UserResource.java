@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import se.group.backendgruppuppgift.tasker.model.User;
 import se.group.backendgruppuppgift.tasker.model.web.UserWeb;
+import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
 import se.group.backendgruppuppgift.tasker.service.UserService;
 
 import javax.ws.rs.*;
@@ -29,11 +30,9 @@ public final class UserResource {
     @Autowired
     private UserService service;
 
-//    private final UserService service;
-
-//    public UserResource(UserService service) {
-//        this.service = service;
-//    }
+    public UserResource(UserService service) {
+        this.service = service;
+    }
 
     @POST
     public Response createUser(UserWeb user) {
@@ -82,5 +81,26 @@ public final class UserResource {
 
         List<User> users = service.findAllUsersBy(firstName.toLowerCase(),lastName.toLowerCase(),userName.toLowerCase());
         return Response.ok(service.findAllUsersBy(firstName.toLowerCase(),lastName.toLowerCase(),userName.toLowerCase())).build();
+    }
+
+    //TODO ------------------------DENNA ÄR INTE KLAR.
+    @PUT
+    @Path("{usernumber}/tasks/{taskid}")
+    public Response updateUserTask(@PathParam("usernumber") Long userNumber,@PathParam("taskid") Long taskId){
+        return service.updateUserTask(userNumber,taskId)
+                .map(Response::ok)
+                .orElse(Response.status(NOT_FOUND))
+                .build();
+    }
+
+    @PUT
+    @Path("{userNumber}/activate")
+    public Response userDeActivator(@PathParam("userNumber")Long userNumber){
+//        return service.userActivator(userNumber)
+//                .map(Response::ok)
+//                .orElse(Response.status(NOT_FOUND))
+//                .build();
+        service.userActivator(userNumber);
+        return Response.status(NO_CONTENT).build();
     }
 }

@@ -1,12 +1,18 @@
 package se.group.backendgruppuppgift.tasker.service;
 
 import org.springframework.stereotype.Service;
+import se.group.backendgruppuppgift.tasker.model.Task;
+import se.group.backendgruppuppgift.tasker.model.TaskStatus;
 import se.group.backendgruppuppgift.tasker.model.Team;
 import se.group.backendgruppuppgift.tasker.model.User;
+import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
+import se.group.backendgruppuppgift.tasker.model.web.UserWeb;
+import se.group.backendgruppuppgift.tasker.repository.TaskRepository;
 import se.group.backendgruppuppgift.tasker.model.web.TeamWeb;
 import se.group.backendgruppuppgift.tasker.model.web.UserWeb;
 import se.group.backendgruppuppgift.tasker.repository.TeamRepository;
 import se.group.backendgruppuppgift.tasker.repository.UserRepository;
+import se.group.backendgruppuppgift.tasker.service.exception.InvalidUserException;
 import se.group.backendgruppuppgift.tasker.service.exception.InvalidTeamException;
 
 import java.util.List;
@@ -14,6 +20,7 @@ import java.util.Optional;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
@@ -25,10 +32,13 @@ public final class UserService {
 
     private final UserRepository repository;
     private  final TeamRepository teamRepository;
+    private final TaskRepository taskRepository;
 
     public UserService(UserRepository repository, TeamRepository teamRepository) {
+    public UserService(UserRepository repository, TaskRepository taskRepository) {
         this.repository = repository;
         this.teamRepository = teamRepository;
+        this.taskRepository = taskRepository;
     }
 
     public UserWeb createUser(UserWeb user) {
@@ -48,6 +58,10 @@ public final class UserService {
         return userWeb;
     }
 
+        public Optional<User> findUserByUserNumber(Long userNumber){
+            return repository.findByUserNumber(userNumber);
+        }
+
     public Optional<UserWeb> findUserByUserNumber(Long userNumber){
         Optional<User> user = repository.findUserByUserNumber(userNumber);
         if(user.isPresent()){
@@ -60,6 +74,9 @@ public final class UserService {
     public Optional<UserWeb> deleteUserByUserNumber(Long userNumber){
         Optional<UserWeb> user = findUserByUserNumber(userNumber);
         if(user.isPresent()){
+    public Optional<User> deleteUserByUserNumber(Long userNumber){
+            Optional<User> user = findUserByUserNumber(userNumber);
+            if(user.isPresent()){
             repository.removeByUserNumber(userNumber);
         }
         return user;
@@ -73,8 +90,37 @@ public final class UserService {
         return repository.findUsersByTeamId(teamId);
     }
 
-    public User updateUser( User newUser){
+    public User userActivator(Long userNumber){
+        Optional<User> newUserOpt = repository.findByUserNumber(userNumber);
+        User newUser = newUserOpt.get();
+        if(newUser.getIsActive() == false){
+            //Lägg till kod för att ta ta bort user från Task och ändra status till Unstarted
+            List<Task> task = taskRepository.findAllByUserUserNumber(newUser.getUserNumber());
+            for(Task t: task){
+                t.setStatus(TaskStatus.UNSTARTED);
+                t.setUser(null);
+                taskRepository.save(t);
+            }
+        }
         return repository.save(newUser);
+    }
+
+    public User updateUser(User user){
+        return repository.save(user);
+    }
+
+    // -------------------------------TODO DENNA ÄR INTE KLAR.
+    public Optional<TaskWeb> updateUserTask(Long userNumber, Long taskId){
+        Optional<User> userResult = repository.findByUserNumber(userNumber);
+        Optional<Task> taskResult = taskRepository.findById(taskId);
+
+        if(taskResult.isPresent()){
+            Task updatedTask = taskResult.get();
+            User updatedUser = userResult.get();
+            updatedTask.setUser(updatedUser);
+            return Optional.ofNullable(convertTaskToWeb(taskRepository.save(updatedTask)));
+        }
+        return Optional.empty();
     }
 
     public List<User> findAllUsersBy(String firstName, String lastName, String userName){
@@ -134,5 +180,19 @@ public final class UserService {
 
     private TeamWeb convertToTeamWeb(Team team) {
         return new TeamWeb(team.getId(), team.getName(), team.getIsActive());
+    }
+
+    private UserWeb convertToWeb(User user) {
+        return new UserWeb(user.getUserNumber(),user.getUsername(),user.getFirstName(),user.getLastName(),user.getIsActive(),user.getTeam());
+    }
+
+    private TaskWeb convertTaskToWeb(Task task) {
+        return new TaskWeb(task.getId(), task.getDescription(), task.getStatus());
+    }
+
+    private void checkUserName(User user){
+        if(user.getFirstName() == null || user.getFirstName().length() <= 10){
+            throw new InvalidUserException("FirstName needs to be 10 characters or longer!");
+        }
     }
 }

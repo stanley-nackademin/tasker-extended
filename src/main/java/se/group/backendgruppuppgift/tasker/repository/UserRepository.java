@@ -12,7 +12,9 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends CrudRepository<User, Long> {
 
-    Optional<User> findUserByUserNumber(Long userNumber);
+    List<User> findByTeam(Team team);
+
+    Optional<User> findByUserNumber(Long userNumber);
 
     @Transactional
     Long removeByUserNumber (Long userNumber);

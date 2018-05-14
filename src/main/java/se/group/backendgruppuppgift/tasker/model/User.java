@@ -25,16 +25,14 @@ public final class User {
     @Column(nullable = false)
     private boolean isActive;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
     private Team team;
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    private Collection<Task> tasks;
 
     protected User() {}
 
     public User(Long userNumber, String userName, String firstName, String lastName, Team team) {
+    public User(Long userNumber, String username, String firstName, String lastName, Team team) {
         this.userNumber = userNumber;
         this.userName = userName;
         this.firstName = firstName;
