@@ -2,6 +2,7 @@ package se.group.backendgruppuppgift.tasker.resource;
 
 import org.springframework.stereotype.Component;
 import se.group.backendgruppuppgift.tasker.model.User;
+import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
 import se.group.backendgruppuppgift.tasker.service.UserService;
 
 import javax.ws.rs.*;
@@ -77,5 +78,15 @@ public final class UserResource {
 
         List<User> users = service.findAllUsersBy(firstName.toLowerCase(),lastName.toLowerCase(),userName.toLowerCase());
         return Response.ok(service.findAllUsersBy(firstName.toLowerCase(),lastName.toLowerCase(),userName.toLowerCase())).build();
+    }
+
+    //TODO ------------------------DENNA ÄR INTE KLAR.
+    @PUT
+    @PathParam("{userNumber}/tasks")
+    public Response updateUserTask(@PathParam("userNumber") Long userNumber, TaskWeb task){
+        return service.updateUserTask(userNumber,task)
+                .map(Response::ok)
+                .orElse(Response.status(NOT_FOUND))
+                .build();
     }
 }

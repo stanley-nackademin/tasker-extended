@@ -1,6 +1,7 @@
 package se.group.backendgruppuppgift.tasker.model;
 
 import javax.persistence.*;
+import java.util.Collection;
 
 @Entity
 public final class User {
@@ -9,7 +10,7 @@ public final class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private Long userNumber;
 
     @Column(nullable = false)
@@ -25,17 +26,20 @@ public final class User {
     private boolean isActive;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "team_id")
+    @JoinColumn
     private Team team;
+
+    //@OneToMany(mappedBy = "user")
+    //private Collection<Task> tasks;
 
     protected User() {}
 
-    public User(Long userNumber, String username, String firstName, String lastName, boolean isActive, Team team) {
+    public User(Long userNumber, String username, String firstName, String lastName, Team team) {
         this.userNumber = userNumber;
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.isActive = isActive;
+        this.isActive = true;
         this.team = team;
     }
 
@@ -67,11 +71,39 @@ public final class User {
         return team;
     }
 
+    //public Collection<Task> getTasks() {
+//        return tasks;
+//    }
+//
+//    public void addTask(Task task) {
+//        tasks.add(task);
+//    }
+//
+//    public void removeTask(Task task) {
+//        tasks.remove(task);
+//    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setIsActive(boolean active) {
+        isActive = active;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
+    }
+
     @Override
     public String toString() {
         return String.format(
-                "User[id=%d, userNumber=%d, firstName='%s', lastName='%s', isActive=%s",
-                id, userNumber, firstName, lastName, isActive
+                "User[id=%d, userNumber=%d, firstName='%s', lastName='%s', isActive=%s, team=%s]",
+                id, userNumber, firstName, lastName, isActive, team/*, tasks*/
         );
     }
 }

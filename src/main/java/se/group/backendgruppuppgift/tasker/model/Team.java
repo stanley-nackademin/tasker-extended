@@ -13,13 +13,13 @@ public final class Team {
     private String name;
 
     @Column(nullable = false)
-    private boolean active;
+    private boolean isActive;
 
-    protected Team(){}
+    protected Team() {}
 
-    public Team(String name, boolean active) {
+    public Team(String name, boolean isActive) {
         this.name = name;
-        this.active = active;
+        this.isActive = isActive;
     }
 
     public Long getId() {
@@ -30,7 +30,23 @@ public final class Team {
         return name;
     }
 
-    public boolean isActive() {
-        return active;
+    public boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setIsActive(boolean active) {
+        isActive = active;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "Team[id=%d, name='%s', isActive=%s]",
+                id, name, isActive
+        );
     }
 }

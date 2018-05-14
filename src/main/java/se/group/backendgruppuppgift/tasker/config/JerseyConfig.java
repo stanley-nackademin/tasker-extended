@@ -1,5 +1,6 @@
 package se.group.backendgruppuppgift.tasker.config;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -15,6 +16,9 @@ public class JerseyConfig extends ResourceConfig {
 
     @Bean
     public ObjectMapper objectMapper() {
-        return new ObjectMapper().registerModule(new ParameterNamesModule());
+        ObjectMapper mapper = new ObjectMapper().registerModule(new ParameterNamesModule());
+        mapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
+
+        return mapper;
     }
 }
