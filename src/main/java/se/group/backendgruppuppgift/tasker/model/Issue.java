@@ -15,19 +15,10 @@ public final class Issue {
     @Column(nullable = false)
     private boolean isDone;
 
-    @OneToOne(mappedBy = "issue")
-    private Task task;
-
     protected Issue() {}
 
     public Issue(String description) {
         this.description = description;
-        this.isDone = false;
-    }
-
-    public Issue(String description, Task task) {
-        this.description = description;
-        this.task = task;
         this.isDone = false;
     }
 
@@ -37,10 +28,6 @@ public final class Issue {
 
     public String getDescription() {
         return description;
-    }
-
-    public Task getTask() {
-        return task;
     }
 
     public boolean getIsDone() {
@@ -58,8 +45,8 @@ public final class Issue {
     @Override
     public String toString() {
         return String.format(
-                "Issue[id=%d, description='%s', isDone='%s', task=%s]",
-                id, description, isDone, task
+                "Issue[id=%d, description='%s', isDone='%s']",
+                id, description, isDone
         );
     }
 }
