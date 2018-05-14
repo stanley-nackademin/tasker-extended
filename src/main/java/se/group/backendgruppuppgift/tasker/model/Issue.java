@@ -20,6 +20,11 @@ public final class Issue {
 
     protected Issue() {}
 
+    public Issue(String description) {
+        this.description = description;
+        this.isDone = false;
+    }
+
     public Issue(String description, Task task) {
         this.description = description;
         this.task = task;

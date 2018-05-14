@@ -1,6 +1,7 @@
 package se.group.backendgruppuppgift.tasker.resource;
 
 import org.springframework.stereotype.Component;
+import se.group.backendgruppuppgift.tasker.model.web.IssueWeb;
 import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
 import se.group.backendgruppuppgift.tasker.service.MasterService;
 
@@ -63,6 +64,15 @@ public final class TaskResource {
     @Path("{id}")
     public Response updateTask(@PathParam("id") Long id, TaskWeb task) {
         return service.getTaskService().updateTask(id, task)
+                .map(Response::ok)
+                .orElse(Response.status(NOT_FOUND))
+                .build();
+    }
+
+    @PUT
+    @Path("{id}/issue")
+    public Response assignIssue(@PathParam("id") Long id, IssueWeb issue) {
+        return service.getTaskService().assignIssue(id, issue)
                 .map(Response::ok)
                 .orElse(Response.status(NOT_FOUND))
                 .build();
