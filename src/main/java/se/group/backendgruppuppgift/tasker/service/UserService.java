@@ -2,6 +2,7 @@ package se.group.backendgruppuppgift.tasker.service;
 
 import org.springframework.stereotype.Service;
 import se.group.backendgruppuppgift.tasker.model.Task;
+import se.group.backendgruppuppgift.tasker.model.TaskStatus;
 import se.group.backendgruppuppgift.tasker.model.User;
 import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
 import se.group.backendgruppuppgift.tasker.model.web.UserWeb;
@@ -9,6 +10,7 @@ import se.group.backendgruppuppgift.tasker.repository.TaskRepository;
 import se.group.backendgruppuppgift.tasker.repository.UserRepository;
 import se.group.backendgruppuppgift.tasker.service.exception.InvalidUserException;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,8 +46,37 @@ public final class UserService {
         return repository.findUsersByTeamId(teamId);
     }
 
-    public User updateUser(User newUser){
+    public User userActivator(Long userNumber){
+        Optional<User> newUserOpt = repository.findByUserNumber(userNumber);
+        User newUser = newUserOpt.get();
+        if(newUser.getIsActive() == false){
+            //Lägg till kod för att ta ta bort user från Task och ändra status till Unstarted
+            List<Task> task = taskRepository.findAllByUserUserNumber(newUser.getUserNumber());
+            for(Task t: task){
+                t.setStatus(TaskStatus.UNSTARTED);
+                t.setUser(null);
+                taskRepository.save(t);
+            }
+        }
         return repository.save(newUser);
+    }
+
+    public User updateUser(User user){
+        return repository.save(user);
+    }
+
+    // -------------------------------TODO DENNA ÄR INTE KLAR.
+    public Optional<TaskWeb> updateUserTask(Long userNumber, Long taskId){
+        Optional<User> userResult = repository.findByUserNumber(userNumber);
+        Optional<Task> taskResult = taskRepository.findById(taskId);
+
+        if(taskResult.isPresent()){
+            Task updatedTask = taskResult.get();
+            User updatedUser = userResult.get();
+            updatedTask.setUser(updatedUser);
+            return Optional.ofNullable(convertTaskToWeb(taskRepository.save(updatedTask)));
+        }
+        return Optional.empty();
     }
 
     public List<User> findAllUsersBy(String firstName, String lastName, String userName){
@@ -65,20 +96,6 @@ public final class UserService {
         }else
             {return repository.findUsersByFirstNameAndLastNameAndUsername(firstName, lastName, userName);
         }
-    }
-
-    // -------------------------------TODO DENNA ÄR INTE KLAR.
-    public Optional<TaskWeb> updateUserTask(Long userNumber, Long taskId){
-        Optional<User> userResult = repository.findByUserNumber(userNumber);
-        Optional<Task> taskResult = taskRepository.findById(taskId);
-
-        if(taskResult.isPresent()){
-           Task updatedTask = taskResult.get();
-           User updatedUser = userResult.get();
-           updatedTask.setUser(updatedUser);
-           return Optional.ofNullable(convertTaskToWeb(taskRepository.save(updatedTask)));
-        }
-        return Optional.empty();
     }
 
     private UserWeb convertToWeb(User user) {

@@ -89,4 +89,15 @@ public final class UserResource {
                 .orElse(Response.status(NOT_FOUND))
                 .build();
     }
+
+    @PUT
+    @Path("{userNumber}/activate")
+    public Response userDeActivator(@PathParam("userNumber")Long userNumber){
+//        return service.userActivator(userNumber)
+//                .map(Response::ok)
+//                .orElse(Response.status(NOT_FOUND))
+//                .build();
+        service.userActivator(userNumber);
+        return Response.status(NO_CONTENT).build();
+    }
 }
