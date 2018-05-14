@@ -43,18 +43,22 @@ public final class TaskService {
         return Optional.empty();
     }
 
-    public List<TaskWeb> findTasksByParams(String status, String team, String user, String text) {
+    public List<TaskWeb> findTasksByParams(String status, String team, String user, String text, String value) {
         List<TaskWeb> result = new ArrayList<>();
 
-        if (!isBlank(status) && isAllBlank(team, user, text)) {
+        if (!isBlank(status) && isAllBlank(team, user, text, value)) {
             findTasksByStatus(status).forEach(t -> result.add(convertToWeb(t)));
-        } else if (!isBlank(team) && isAllBlank(status, user, text)) {
+        } else if (!isBlank(team) && isAllBlank(status, user, text, value)) {
 
-        } else if (!isBlank(user) && isAllBlank(status, team, text)) {
+        } else if (!isBlank(user) && isAllBlank(status, team, text, value)) {
             // TODO: 2018-05-11 Change to username
             taskRepository.findByUserId(Long.parseLong(user)).forEach(t -> result.add(convertToWeb(t)));
-        } else if (!isBlank(text) && isAllBlank(status, team, user)) {
+        } else if (!isBlank(text) && isAllBlank(status, team, user, value)) {
             taskRepository.findByDescriptionContains(text).forEach(t -> result.add(convertToWeb(t)));
+        } else if (!isBlank(value) && value.equals("true") && isAllBlank(status, team, user, text)) {
+            taskRepository.findByIssueNotNull().forEach(t -> result.add(convertToWeb(t)));
+        } else if (!isBlank(value) && value.equals("false") && isAllBlank(status, team, user, text)) {
+            taskRepository.findByIssueNull().forEach(t -> result.add(convertToWeb(t)));
         } else {
             taskRepository.findAll().forEach(t -> result.add(convertToWeb(t)));
         }
@@ -86,9 +90,11 @@ public final class TaskService {
 
         if (task.isPresent()) {
             Task updatedTask = task.get();
+            validateTaskStatus(updatedTask);
             Issue issue = issueRepository.save(new Issue(issueWeb.getDescription()));
 
             updatedTask.setIssue(issue);
+            updatedTask.setStatus(UNSTARTED);
             updatedTask = taskRepository.save(updatedTask);
 
             return Optional.ofNullable(convertToWeb(updatedTask));
@@ -140,5 +146,10 @@ public final class TaskService {
     private void validateTask(TaskWeb task) {
         if (task.getStatus() == null || isBlank(task.getDescription()))
             throw new InvalidTaskException("Missing/invalid values");
+    }
+
+    private void validateTaskStatus(Task task) {
+        if (!(task.getStatus() == DONE))
+            throw new InvalidTaskException("The current Task's status is not DONE");
     }
 }

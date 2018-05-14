@@ -21,8 +21,7 @@ public final class Task {
     @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(unique = true)
     private Issue issue;
-@OneToOne(mappedBy = "issue")
-    private Task task;
+
     protected Task() {}
 
     public Task(String description, TaskStatus status) {
