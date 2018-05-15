@@ -11,6 +11,7 @@ import se.group.backendgruppuppgift.tasker.repository.TaskRepository;
 import se.group.backendgruppuppgift.tasker.model.web.TeamWeb;
 import se.group.backendgruppuppgift.tasker.repository.TeamRepository;
 import se.group.backendgruppuppgift.tasker.repository.UserRepository;
+import se.group.backendgruppuppgift.tasker.resource.converter.UserConverter;
 import se.group.backendgruppuppgift.tasker.service.exception.InvalidUserException;
 import se.group.backendgruppuppgift.tasker.service.exception.InvalidTeamException;
 
@@ -73,11 +74,11 @@ public final class UserService {
         return user;
     }
 
-    private UserWeb convertToWeb(User user) {
-        return new UserWeb(user.getUserNumber(),user.getUsername()
-                ,user.getFirstName(),user.getLastName()
-                , user.getIsActive(), user.getTeam());
-    }
+//    private UserWeb convertToWeb(User user) {
+//        return new UserWeb(user.getUserNumber(),user.getUsername()
+//                ,user.getFirstName(),user.getLastName()
+//                , user.getIsActive(), user.getTeam());
+//    }
 
 
     public User findLastUser(){
@@ -109,8 +110,6 @@ public final class UserService {
 
         if(user.isPresent()){
             User updatedUser = user.get();
-            if (!isBlank(userWeb.getUserName()))
-                updatedUser.setUsername(userWeb.getUserName());
             if(!isBlank(userWeb.getFirstName()))
                 updatedUser.setFirstName(userWeb.getFirstName());
             if(!isBlank(userWeb.getLastName()))
@@ -118,7 +117,8 @@ public final class UserService {
             if (updatedUser.getIsActive() != null)
                 updatedUser.setIsActive(userWeb.getIsActive());
 
-            return Optional.ofNullable(userWeb.getOptionalFromUser(repository.save(updatedUser)));
+            return Optional.ofNullable(repository.save(updatedUser));
+            //return Optional.ofNullable(repository.save(UserConverter.getOptionalUserWeb(updatedUser)));
                     //Optional.ofNullable(userWeb.convertToWeb(repository.save(updatedUser)));
         }
         return Optional.empty();
@@ -130,7 +130,6 @@ public final class UserService {
 
         if (task.isPresent()) {
             Task updatedTask = task.get();
-
             if (!isBlank(taskWeb.getDescription()))
                 updatedTask.setDescription(taskWeb.getDescription());
 
