@@ -13,7 +13,7 @@ public final class Team {
     private String name;
 
     @Column(nullable = false)
-    private boolean isActive;
+    private Boolean isActive;
 
     protected Team() {}
 
@@ -30,7 +30,7 @@ public final class Team {
         return name;
     }
 
-    public boolean getIsActive() {
+    public Boolean getIsActive() {
         return isActive;
     }
 
