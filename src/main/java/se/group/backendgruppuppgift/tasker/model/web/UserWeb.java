@@ -16,12 +16,12 @@ public final class UserWeb {
     protected UserWeb() {
     }
 
-    public UserWeb(Long userNumber, String userName, String firstName, String lastName, Team team) {
+    public UserWeb(Long userNumber, String userName, String firstName, String lastName, Boolean isActive, Team team) {
         this.userNumber = userNumber;
         this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.isActive = true;
+        this.isActive = isActive;
         this.team = team;
     }
 
@@ -62,7 +62,9 @@ public final class UserWeb {
     }
 
     public static Optional<UserWeb> getOptionalFromUser(User user){
-        UserWeb userWeb = new UserWeb(user.getUserNumber(), user.getUsername(), user.getFirstName(), user.getLastName(), user.getTeam());
+        UserWeb userWeb = new UserWeb(user.getUserNumber(), user.getUsername()
+                , user.getFirstName(), user.getLastName()
+                , user.getIsActive(), user.getTeam());
         return Optional.ofNullable(userWeb);
     }
 }

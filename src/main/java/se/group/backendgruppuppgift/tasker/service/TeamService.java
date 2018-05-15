@@ -23,8 +23,7 @@ public final class TeamService {
     }
 
     public TeamWeb createTeam(TeamWeb team) {
-        Team result = teamRepository.save(new Team(team.getName(), team.getIsActive()));
-
+        Team result = teamRepository.save(new Team(team.getName(), true));
         return convertToWeb(result);
     }
 

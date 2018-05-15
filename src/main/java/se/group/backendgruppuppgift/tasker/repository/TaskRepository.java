@@ -20,7 +20,6 @@ public interface TaskRepository extends CrudRepository<Task, Long> {
 
     List<Task> findByIssueNull();
 
-    //jonasmerge2.0
     List<Task> findAllByUserUserNumber(Long userNumber);
 
     @Override

@@ -1,7 +1,6 @@
 package se.group.backendgruppuppgift.tasker.model;
 
 import javax.persistence.*;
-import java.util.Collection;
 
 @Entity
 public final class User {
@@ -23,7 +22,7 @@ public final class User {
     private String lastName;
 
     @Column(nullable = false)
-    private boolean isActive;
+    private Boolean isActive;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
@@ -36,7 +35,6 @@ public final class User {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.isActive = true;
         this.team = team;
     }
 

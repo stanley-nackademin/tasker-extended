@@ -16,14 +16,11 @@ import se.group.backendgruppuppgift.tasker.service.exception.InvalidTeamExceptio
 
 import java.util.List;
 import java.util.Optional;
-
-
 import java.util.concurrent.atomic.AtomicLong;
+
 
 @Service
 public final class UserService {
-
-
 
     private final UserRepository repository;
     private  final TeamRepository teamRepository;
@@ -37,21 +34,25 @@ public final class UserService {
 
     public UserWeb createUser(UserWeb user) {
         Long userNumber;
-        try{
-            userNumber = repository.findFirstByOrderByUserNumberDesc().getUserNumber();
-        }catch (NullPointerException e){
+
+       Optional<User> optionalUser = repository.findFirstByOrderByUserNumberDesc();
+       if(optionalUser.isPresent())
+           userNumber = repository.findFirstByOrderByUserNumberDesc().get().getUserNumber();
+       else
             userNumber = 1000L;
-        }
 
         AtomicLong number = new AtomicLong(userNumber);
         userNumber = number.incrementAndGet();
 
-        UserWeb userWeb = new UserWeb(userNumber, user.getUserName() ,user.getFirstName(), user.getLastName(), user.getTeam());
+        UserWeb userWeb = new UserWeb(userNumber, user.getUserName()
+                ,user.getFirstName(), user.getLastName()
+                ,user.getIsActive(), user.getTeam());
+
         User entityUser = new User(userWeb.getUserNumber(), userWeb.getUserName(), userWeb.getFirstName(), userWeb.getLastName(), null);
+        entityUser.setIsActive(true);
         repository.save(entityUser);
         return userWeb;
     }
-
 
     public Optional<UserWeb> findUserByUserNumber(Long userNumber){
         Optional<User> user = repository.findByUserNumber(userNumber);
@@ -71,7 +72,7 @@ public final class UserService {
     }
 
     public User findLastUser(){
-        return repository.findFirstByOrderByUserNumberDesc();
+        return repository.findFirstByOrderByUserNumberDesc().get();
     }
 
     public List<User> findUsersByTeamId(Long teamId){
@@ -171,7 +172,9 @@ public final class UserService {
     }
 
     private UserWeb convertToWeb(User user) {
-        return new UserWeb(user.getUserNumber(),user.getUsername(),user.getFirstName(),user.getLastName(),user.getTeam());
+        return new UserWeb(user.getUserNumber(),user.getUsername()
+                ,user.getFirstName(),user.getLastName()
+                , user.getIsActive(), user.getTeam());
     }
 
     private TaskWeb convertTaskToWeb(Task task) {
