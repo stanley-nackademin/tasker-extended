@@ -5,7 +5,6 @@ import se.group.backendgruppuppgift.tasker.model.web.UserWeb;
 
 import java.util.Optional;
 
-
 public class UserConverter{
 
     public static Optional<User> getOptionalUser(UserWeb userWeb){

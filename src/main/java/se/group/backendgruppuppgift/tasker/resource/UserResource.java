@@ -29,10 +29,11 @@ public final class UserResource {
     private UriInfo uriInfo;
 
     private final UserService service;
-    private final UserConverter converter = new UserConverter();
+    private final UserConverter converter;
 
     public UserResource(UserService service) {
         this.service = service;
+        this.converter = new UserConverter();
     }
 
     @POST
@@ -51,7 +52,8 @@ public final class UserResource {
     @DELETE
     @Path("{userNumber}")
     public Response deleteUserByUserNumber(@PathParam ("userNumber") Long userNumber){
-        Optional<UserWeb> result = service.deleteUserByUserNumber(userNumber);
+        Optional<User> task = service.deleteUserByUserNumber(userNumber);
+        Optional<UserWeb> result = converter.getOptionalUserWeb(task.get());
         return result.map(r -> Response.status(NO_CONTENT)).orElse(Response.status(NOT_FOUND)).build();
     }
 
