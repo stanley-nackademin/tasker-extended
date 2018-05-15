@@ -3,10 +3,12 @@ package se.group.backendgruppuppgift.tasker.service;
 import org.springframework.stereotype.Service;
 import se.group.backendgruppuppgift.tasker.model.Issue;
 import se.group.backendgruppuppgift.tasker.model.Task;
+import se.group.backendgruppuppgift.tasker.model.User;
 import se.group.backendgruppuppgift.tasker.model.web.IssueWeb;
 import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
 import se.group.backendgruppuppgift.tasker.repository.IssueRepository;
 import se.group.backendgruppuppgift.tasker.repository.TaskRepository;
+import se.group.backendgruppuppgift.tasker.repository.UserRepository;
 import se.group.backendgruppuppgift.tasker.service.exception.InvalidTaskException;
 
 import java.util.ArrayList;
@@ -21,10 +23,12 @@ public final class TaskService {
 
     private final TaskRepository taskRepository;
     private final IssueRepository issueRepository;
+    private final UserRepository userRepository;
 
-    public TaskService(TaskRepository taskRepository, IssueRepository issueRepository) {
+    public TaskService(TaskRepository taskRepository, IssueRepository issueRepository, UserRepository userRepository) {
         this.taskRepository = taskRepository;
         this.issueRepository = issueRepository;
+        this.userRepository = userRepository;
     }
 
     public TaskWeb createTask(TaskWeb taskWeb) {
@@ -51,8 +55,15 @@ public final class TaskService {
         } else if (!isBlank(team) && isAllBlank(status, user, text, value)) {
 
         } else if (!isBlank(user) && isAllBlank(status, team, text, value)) {
-            // TODO: 2018-05-11 Change to username
-            taskRepository.findByUserId(Long.parseLong(user)).forEach(t -> result.add(convertToWeb(t)));
+
+            if (user.matches("[0-9]+")) {
+                Optional<User> userRepo = userRepository.findByUserNumber(Long.parseLong(user));
+
+                if (userRepo.isPresent()) {
+                    User userObject = userRepo.get();
+                    taskRepository.findByUserId(userObject.getId()).forEach(t -> result.add(convertToWeb(t)));
+                }
+            }
         } else if (!isBlank(text) && isAllBlank(status, team, user, value)) {
             taskRepository.findByDescriptionContains(text).forEach(t -> result.add(convertToWeb(t)));
         } else if (!isBlank(value) && value.equals("true") && isAllBlank(status, team, user, text)) {
