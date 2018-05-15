@@ -4,8 +4,6 @@ import org.springframework.stereotype.Service;
 import se.group.backendgruppuppgift.tasker.model.Issue;
 import se.group.backendgruppuppgift.tasker.model.Task;
 import se.group.backendgruppuppgift.tasker.model.User;
-import se.group.backendgruppuppgift.tasker.model.web.IssueWeb;
-import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
 import se.group.backendgruppuppgift.tasker.repository.IssueRepository;
 import se.group.backendgruppuppgift.tasker.repository.TaskRepository;
 import se.group.backendgruppuppgift.tasker.repository.UserRepository;
@@ -15,7 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isAllBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static se.group.backendgruppuppgift.tasker.model.TaskStatus.*;
 
 @Service
@@ -51,9 +50,9 @@ public final class TaskService {
         List<Task> result = new ArrayList<>();
 
         if (!isBlank(status) && isAllBlank(team, user, text, value)) {
-            findTasksByStatus(status).forEach(t -> result.add(t));
+            result = findTasksByStatus(status);
         } else if (!isBlank(team) && isAllBlank(status, user, text, value)) {
-
+            // TODO: 2018-05-15  
         } else if (!isBlank(user) && isAllBlank(status, team, text, value)) {
 
             if (user.matches("[0-9]+")) {
@@ -61,17 +60,17 @@ public final class TaskService {
 
                 if (userRepo.isPresent()) {
                     User userObject = userRepo.get();
-                    taskRepository.findByUserId(userObject.getId()).forEach(t -> result.add(t));
+                    result = taskRepository.findByUserId(userObject.getId());
                 }
             }
         } else if (!isBlank(text) && isAllBlank(status, team, user, value)) {
-            taskRepository.findByDescriptionContains(text).forEach(t -> result.add(t));
+            result = taskRepository.findByDescriptionContains(text);
         } else if (!isBlank(value) && value.equals("true") && isAllBlank(status, team, user, text)) {
-            taskRepository.findByIssueNotNull().forEach(t -> result.add(t));
+            result = taskRepository.findByIssueNotNull();
         } else if (!isBlank(value) && value.equals("false") && isAllBlank(status, team, user, text)) {
-            taskRepository.findByIssueNull().forEach(t -> result.add(t));
+            result = taskRepository.findByIssueNull();
         } else {
-            taskRepository.findAll().forEach(t -> result.add(t));
+            result = taskRepository.findAll();
         }
 
         return result;
@@ -144,14 +143,6 @@ public final class TaskService {
 
     private String prepareString(String string) {
         return string.trim().toLowerCase();
-    }
-
-    private TaskWeb convertToWeb(Task task) {
-        return new TaskWeb(task.getId(), task.getDescription(), task.getStatus(), convertIssueToWeb(task.getIssue()));
-    }
-
-    private IssueWeb convertIssueToWeb(Issue issue) {
-        return issue != null ? new IssueWeb(issue.getDescription(), issue.getIsDone()) : null;
     }
 
     private void validateTask(Task task) {
