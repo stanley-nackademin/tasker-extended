@@ -12,8 +12,6 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends CrudRepository<User, Long> {
 
-    List<User> findByTeam(Team team);
-
     Optional<User> findByUserNumber(Long userNumber);
 
     @Transactional
@@ -25,7 +23,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     //jonasmergeADD
     List<User> findUsersByTeam(Team team);
-//    User findFirstByOrderByIdDesc();
+    User findFirstByOrderByIdDesc();
     User findFirstByOrderByUserNumberDesc();
 
     List<User> findUsersByFirstName(String firstName);
@@ -35,5 +33,4 @@ public interface UserRepository extends CrudRepository<User, Long> {
     List<User> findUsersByFirstNameAndUserName(String firstName, String userName);
     List<User> findUsersByUserNameAndLastName(String userName, String lastName);
     List<User> findUsersByFirstNameAndLastNameAndUserName(String firstName, String lastName, String userName);
-    Optional<User> findByUserNumber(Long userNumber);
 }

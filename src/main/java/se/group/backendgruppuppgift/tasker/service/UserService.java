@@ -6,21 +6,14 @@ import se.group.backendgruppuppgift.tasker.model.TaskStatus;
 import se.group.backendgruppuppgift.tasker.model.Team;
 import se.group.backendgruppuppgift.tasker.model.User;
 import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
-import se.group.backendgruppuppgift.tasker.model.web.UserWeb;
-import se.group.backendgruppuppgift.tasker.repository.TaskRepository;
 import se.group.backendgruppuppgift.tasker.model.web.TeamWeb;
 import se.group.backendgruppuppgift.tasker.model.web.UserWeb;
+import se.group.backendgruppuppgift.tasker.repository.TaskRepository;
 import se.group.backendgruppuppgift.tasker.repository.TeamRepository;
 import se.group.backendgruppuppgift.tasker.repository.UserRepository;
-import se.group.backendgruppuppgift.tasker.service.exception.InvalidUserException;
 import se.group.backendgruppuppgift.tasker.service.exception.InvalidTeamException;
+import se.group.backendgruppuppgift.tasker.service.exception.InvalidUserException;
 
-import java.util.List;
-import java.util.Optional;
-
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
@@ -34,8 +27,7 @@ public final class UserService {
     private  final TeamRepository teamRepository;
     private final TaskRepository taskRepository;
 
-    public UserService(UserRepository repository, TeamRepository teamRepository) {
-    public UserService(UserRepository repository, TaskRepository taskRepository) {
+    public UserService(UserRepository repository, TeamRepository teamRepository, TaskRepository taskRepository) {
         this.repository = repository;
         this.teamRepository = teamRepository;
         this.taskRepository = taskRepository;
@@ -52,18 +44,18 @@ public final class UserService {
         AtomicLong number = new AtomicLong(userNumber);
         userNumber = number.incrementAndGet();
 
-        UserWeb userWeb = new UserWeb(userNumber, user.getUserName() ,user.getFirstName(), user.getLastName(), user.getTeam());
-        User entityUser = new User(userWeb.getUserNumber(), userWeb.getUserName(), userWeb.getFirstName(), userWeb.getLastName(), null);
+        UserWeb userWeb = new UserWeb(userNumber, user.getusername() ,user.getFirstName(), user.getLastName(), user.getTeam());
+        User entityUser = new User(userWeb.getUserNumber(), userWeb.getusername(), userWeb.getFirstName(), userWeb.getLastName(), null);
         repository.save(entityUser);
         return userWeb;
     }
 
-        public Optional<User> findUserByUserNumber(Long userNumber){
-            return repository.findByUserNumber(userNumber);
-        }
+//        public Optional<User> findByUserNumber(Long userNumber){
+//            return repository.findByUserNumber(userNumber);
+//        }
 
     public Optional<UserWeb> findUserByUserNumber(Long userNumber){
-        Optional<User> user = repository.findUserByUserNumber(userNumber);
+        Optional<User> user = repository.findByUserNumber(userNumber);
         if(user.isPresent()){
             User user2 = user.get();
             return UserWeb.getOptionalFromUser(user2);
@@ -74,9 +66,9 @@ public final class UserService {
     public Optional<UserWeb> deleteUserByUserNumber(Long userNumber){
         Optional<UserWeb> user = findUserByUserNumber(userNumber);
         if(user.isPresent()){
-    public Optional<User> deleteUserByUserNumber(Long userNumber){
-            Optional<User> user = findUserByUserNumber(userNumber);
-            if(user.isPresent()){
+    //public Optional<User> deleteUserByUserNumber(Long userNumber){
+    //        Optional<User> user = findUserByUserNumber(userNumber);
+            //       if(user.isPresent()){
             repository.removeByUserNumber(userNumber);
         }
         return user;
@@ -123,22 +115,22 @@ public final class UserService {
         return Optional.empty();
     }
 
-    public List<User> findAllUsersBy(String firstName, String lastName, String userName){
-        System.out.println(firstName + lastName + userName);
-        if (!firstName.isEmpty() && lastName.isEmpty() && userName.isEmpty()){ // om allt är null förutom firstname
+    public List<User> findAllUsersBy(String firstName, String lastName, String username){
+        System.out.println(firstName + lastName + username);
+        if (!firstName.isEmpty() && lastName.isEmpty() && username.isEmpty()){ // om allt är null förutom firstname
            return repository.findUsersByFirstName(firstName);
-        }else if(firstName.isEmpty() && !lastName.isEmpty() && userName.isEmpty()){ // om allt är null förutom lastname
+        }else if(firstName.isEmpty() && !lastName.isEmpty() && username.isEmpty()){ // om allt är null förutom lastname
             return repository.findUsersByLastName(lastName);
-        }else if(firstName.isEmpty() && lastName.isEmpty() && !userName.isEmpty()){ // om allt är null förutom username
-            return repository.findUsersByUserName(userName);
-        }else if (!firstName.isEmpty() && !lastName.isEmpty() && userName.isEmpty()){ // om allt är null förutom firsntame och lastname
+        }else if(firstName.isEmpty() && lastName.isEmpty() && !username.isEmpty()){ // om allt är null förutom username
+            return repository.findUsersByUsername(username);
+        }else if (!firstName.isEmpty() && !lastName.isEmpty() && username.isEmpty()){ // om allt är null förutom firsntame och lastname
             return repository.findUsersByFirstNameAndLastName(firstName,lastName);
-        }else if (!firstName.isEmpty() && lastName.isEmpty() && !userName.isEmpty()){ // om allt är null förutom firstNAme och username
-            return repository.findUsersByFirstNameAndUserName(firstName,userName);
-        }else if(firstName.isEmpty() && !lastName.isEmpty() && !userName.isEmpty()){ // om firstname är null
-            return repository.findUsersByUserNameAndLastName(userName, lastName);
+        }else if (!firstName.isEmpty() && lastName.isEmpty() && !username.isEmpty()){ // om allt är null förutom firstNAme och username
+            return repository.findUsersByFirstNameAndUsername(firstName,username);
+        }else if(firstName.isEmpty() && !lastName.isEmpty() && !username.isEmpty()){ // om firstname är null
+            return repository.findUsersByUsernameAndLastName(username, lastName);
         }else
-            {return repository.findUsersByFirstNameAndLastNameAndUserName(firstName, lastName, userName);
+            {return repository.findUsersByFirstNameAndLastNameAndUsername(firstName, lastName, username);
         }
     }
 
@@ -173,7 +165,7 @@ public final class UserService {
     private void userTeamValidation(User user) {
 
         if (user.getTeam() != null) {
-            throw new InvalidTeamException("User: " + user.getUserName() + " is already in a team");
+            throw new InvalidTeamException("User: " + user.getuser() + " is already in a team");
         }
 
     }
@@ -183,14 +175,14 @@ public final class UserService {
     }
 
     private UserWeb convertToWeb(User user) {
-        return new UserWeb(user.getUserNumber(),user.getUsername(),user.getFirstName(),user.getLastName(),user.getIsActive(),user.getTeam());
+        return new UserWeb(user.getUserNumber(),user.getusername(),user.getFirstName(),user.getLastName(),user.getIsActive(),user.getTeam());
     }
 
     private TaskWeb convertTaskToWeb(Task task) {
         return new TaskWeb(task.getId(), task.getDescription(), task.getStatus());
     }
 
-    private void checkUserName(User user){
+    private void checkusername(User user){
         if(user.getFirstName() == null || user.getFirstName().length() <= 10){
             throw new InvalidUserException("FirstName needs to be 10 characters or longer!");
         }
