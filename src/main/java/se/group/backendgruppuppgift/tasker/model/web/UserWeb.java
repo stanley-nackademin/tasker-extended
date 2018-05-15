@@ -62,7 +62,7 @@ public final class UserWeb {
     }
 
     public static Optional<UserWeb> getOptionalFromUser(User user){
-        UserWeb userWeb = new UserWeb(user.getUserNumber(), user.getUserName(), user.getFirstName(), user.getLastName(), user.getTeam());
+        UserWeb userWeb = new UserWeb(user.getUserNumber(), user.getUsername(), user.getFirstName(), user.getLastName(), user.getTeam());
         return Optional.ofNullable(userWeb);
     }
 }
