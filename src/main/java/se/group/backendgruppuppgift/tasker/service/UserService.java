@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static org.apache.commons.lang3.StringUtils.*;
 
+
 @Service
 public final class UserService {
 
@@ -33,26 +34,26 @@ public final class UserService {
         this.taskRepository = taskRepository;
     }
 
-    public UserWeb createUser(UserWeb user) {
+    public User createUser(User user) {
         Long userNumber;
+        Optional<User> optionalUser = repository.findFirstByOrderByUserNumberDesc();
 
-       Optional<User> optionalUser = repository.findFirstByOrderByUserNumberDesc();
-       if(optionalUser.isPresent())
+        if(optionalUser.isPresent())
            userNumber = repository.findFirstByOrderByUserNumberDesc().get().getUserNumber();
-       else
+        else
             userNumber = 1000L;
 
         AtomicLong number = new AtomicLong(userNumber);
         userNumber = number.incrementAndGet();
 
-        UserWeb userWeb = new UserWeb(userNumber, user.getUserName()
-                ,user.getFirstName(), user.getLastName()
-                ,user.getIsActive(), user.getTeam());
+        user.setUserNumber(userNumber);
+        user.setIsActive(true);
 
-        User entityUser = new User(userWeb.getUserNumber(), userWeb.getUserName(), userWeb.getFirstName(), userWeb.getLastName(), null);
-        entityUser.setIsActive(true);
-        repository.save(entityUser);
-        return userWeb;
+        if(repository.findUserByUsername(user.getUsername()).isPresent())
+            throw new InvalidUserException("Username already in use");
+
+        repository.save(user);
+        return user;
     }
 
     public Optional<UserWeb> findUserByUserNumber(Long userNumber){
@@ -71,6 +72,13 @@ public final class UserService {
         }
         return user;
     }
+
+    private UserWeb convertToWeb(User user) {
+        return new UserWeb(user.getUserNumber(),user.getUsername()
+                ,user.getFirstName(),user.getLastName()
+                , user.getIsActive(), user.getTeam());
+    }
+
 
     public User findLastUser(){
         return repository.findFirstByOrderByUserNumberDesc().get();
@@ -207,12 +215,6 @@ public final class UserService {
 
     private TeamWeb convertToTeamWeb(Team team) {
         return new TeamWeb(team.getId(), team.getName(), team.getIsActive());
-    }
-
-    private UserWeb convertToWeb(User user) {
-        return new UserWeb(user.getUserNumber(),user.getUsername()
-                ,user.getFirstName(),user.getLastName()
-                , user.getIsActive(), user.getTeam());
     }
 
     private TaskWeb convertTaskToWeb(Task task) {
