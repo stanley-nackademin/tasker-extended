@@ -32,7 +32,6 @@ public final class User {
     protected User() {}
 
     public User(Long userNumber, String username, String firstName, String lastName, Team team) {
-    public User(Long userNumber, String username, String firstName, String lastName, Team team) {
         this.userNumber = userNumber;
         this.username = username;
         this.firstName = firstName;
@@ -49,7 +48,7 @@ public final class User {
         return userNumber;
     }
 
-    public String getusername() {
+    public String getUsername() {
         return username;
     }
 
@@ -69,18 +68,6 @@ public final class User {
         return team;
     }
 
-    public Collection<Task> getTasks() {
-        return tasks;
-    }
-
-    public void addTask(Task task) {
-        tasks.add(task);
-    }
-
-    public void removeTask(Task task) {
-        tasks.remove(task);
-    }
-
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -97,7 +84,7 @@ public final class User {
         this.team = team;
     }
 
-    public void setusername(String username) {
+    public void setUsername(String username) {
         this.username = username;
     }
 

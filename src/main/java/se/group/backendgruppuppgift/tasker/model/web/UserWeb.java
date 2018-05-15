@@ -7,7 +7,7 @@ import java.util.Optional;
 public final class UserWeb {
 
     private Long userNumber;
-    private String username;
+    private String userName;
     private String firstName;
     private String lastName;
     private Boolean isActive;
@@ -16,9 +16,9 @@ public final class UserWeb {
     protected UserWeb() {
     }
 
-    public UserWeb(Long userNumber, String username, String firstName, String lastName, Team team) {
+    public UserWeb(Long userNumber, String userName, String firstName, String lastName, Team team) {
         this.userNumber = userNumber;
-        this.username = username;
+        this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.isActive = true;
@@ -29,8 +29,8 @@ public final class UserWeb {
         return userNumber;
     }
 
-    public String getUsername() {
-        return username;
+    public String getUserName() {
+        return userName;
     }
 
     public String getFirstName() {
@@ -53,7 +53,7 @@ public final class UserWeb {
     public String toString() {
         return "UserWeb{" +
                 "userNumber=" + userNumber +
-                ", username='" + username + '\'' +
+                ", username='" + userName + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", isActive=" + isActive +
@@ -62,7 +62,7 @@ public final class UserWeb {
     }
 
     public static Optional<UserWeb> getOptionalFromUser(User user){
-        UserWeb userWeb = new UserWeb(user.getUserNumber(), user.get(), user.getFirstName(), user.getLastName(), user.getTeam());
+        UserWeb userWeb = new UserWeb(user.getUserNumber(), user.getUsername(), user.getFirstName(), user.getLastName(), user.getTeam());
         return Optional.ofNullable(userWeb);
     }
 }
