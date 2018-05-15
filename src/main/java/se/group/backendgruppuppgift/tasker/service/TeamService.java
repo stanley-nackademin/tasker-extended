@@ -8,6 +8,7 @@ import se.group.backendgruppuppgift.tasker.repository.TeamRepository;
 import se.group.backendgruppuppgift.tasker.repository.UserRepository;
 import se.group.backendgruppuppgift.tasker.service.exception.InvalidTeamException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,9 +18,11 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public final class TeamService {
 
     private final TeamRepository teamRepository;
+    private final UserRepository userRepository;
 
-    public TeamService(TeamRepository teamRepository) {
+    public TeamService(TeamRepository teamRepository, UserRepository userRepository) {
         this.teamRepository = teamRepository;
+        this.userRepository = userRepository;
     }
 
     public TeamWeb createTeam(TeamWeb team) {
@@ -39,6 +42,18 @@ public final class TeamService {
 
     public List<Team> getAllTeams() {
         return teamRepository.findAll();
+    }
+
+    public List<User> getAllUserByTeamName(String teamName) {
+        Optional<Team> result = teamRepository.findByName(teamName);
+        List<User> userList = new ArrayList<>();
+
+        if(result.isPresent()){
+            Team team = result.get();
+            userList = userRepository.findUsersByTeamId(team.getId());
+        }
+
+        return  userList;
     }
 
 
