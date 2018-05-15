@@ -57,17 +57,16 @@ public final class UserService {
         return user;
     }
 
-    public Optional<UserWeb> findUserByUserNumber(Long userNumber){
+    public Optional<User> findUserByUserNumber(Long userNumber){
         Optional<User> user = repository.findByUserNumber(userNumber);
         if(user.isPresent()){
-            Optional<UserWeb> userWeb = Optional.ofNullable(convertToWeb(user.get()));
-            return userWeb;
+            return user;
         }
         return Optional.empty();
     }
 
-    public Optional<UserWeb> deleteUserByUserNumber(Long userNumber){
-        Optional<UserWeb> user = findUserByUserNumber(userNumber);
+    public Optional<User> deleteUserByUserNumber(Long userNumber){
+        Optional<User> user = findUserByUserNumber(userNumber);
         if(user.isPresent()){
             repository.removeByUserNumber(userNumber);
         }
