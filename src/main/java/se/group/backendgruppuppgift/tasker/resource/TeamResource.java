@@ -72,7 +72,10 @@ public final class TeamResource {
     @Path("{id}/add")
     public Response assignTeamToUser(@PathParam("id") Long id, UserWeb userWeb){
         UserService userService = service.getUserService();
-        return userService.addTeam(id, userWeb).map(teamWeb -> Response.status(NO_CONTENT)).orElse(Response.status(NOT_FOUND)).build();
+        return userService.addTeam(id, userWeb)
+                .map(Response::ok)
+                .orElse(Response.status(NOT_FOUND))
+                .build();
     }
 
     @DELETE
