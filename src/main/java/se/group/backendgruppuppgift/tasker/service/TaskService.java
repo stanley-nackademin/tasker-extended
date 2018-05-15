@@ -3,17 +3,18 @@ package se.group.backendgruppuppgift.tasker.service;
 import org.springframework.stereotype.Service;
 import se.group.backendgruppuppgift.tasker.model.Issue;
 import se.group.backendgruppuppgift.tasker.model.Task;
-import se.group.backendgruppuppgift.tasker.model.web.IssueWeb;
-import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
+import se.group.backendgruppuppgift.tasker.model.User;
 import se.group.backendgruppuppgift.tasker.repository.IssueRepository;
 import se.group.backendgruppuppgift.tasker.repository.TaskRepository;
+import se.group.backendgruppuppgift.tasker.repository.UserRepository;
 import se.group.backendgruppuppgift.tasker.service.exception.InvalidTaskException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isAllBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static se.group.backendgruppuppgift.tasker.model.TaskStatus.*;
 
 @Service
@@ -21,95 +22,104 @@ public final class TaskService {
 
     private final TaskRepository taskRepository;
     private final IssueRepository issueRepository;
+    private final UserRepository userRepository;
 
-    public TaskService(TaskRepository taskRepository, IssueRepository issueRepository) {
+    public TaskService(TaskRepository taskRepository, IssueRepository issueRepository, UserRepository userRepository) {
         this.taskRepository = taskRepository;
         this.issueRepository = issueRepository;
+        this.userRepository = userRepository;
     }
 
-    public TaskWeb createTask(TaskWeb taskWeb) {
-        validateTask(taskWeb);
-        Task task = taskRepository.save(new Task(taskWeb.getDescription(), taskWeb.getStatus()));
+    public Task createTask(Task task) {
+        validateTask(task);
+        Task taskResult = taskRepository.save(new Task(task.getDescription(), task.getStatus()));
 
-        return convertToWeb(task);
+        return taskResult;
     }
 
-    public Optional<TaskWeb> findTask(Long id) {
+    public Optional<Task> findTask(Long id) {
         Optional<Task> task = taskRepository.findById(id);
 
         if (task.isPresent())
-            return Optional.ofNullable(convertToWeb(task.get()));
+            return Optional.ofNullable(task.get());
 
         return Optional.empty();
     }
 
-    public List<TaskWeb> findTasksByParams(String status, String team, String user, String text, String value) {
-        List<TaskWeb> result = new ArrayList<>();
+    public List<Task> findTasksByParams(String status, String team, String user, String text, String value) {
+        List<Task> result = new ArrayList<>();
 
         if (!isBlank(status) && isAllBlank(team, user, text, value)) {
-            findTasksByStatus(status).forEach(t -> result.add(convertToWeb(t)));
+            result = findTasksByStatus(status);
         } else if (!isBlank(team) && isAllBlank(status, user, text, value)) {
-
+            // TODO: 2018-05-15  
         } else if (!isBlank(user) && isAllBlank(status, team, text, value)) {
-            // TODO: 2018-05-11 Change to username
-            taskRepository.findByUserId(Long.parseLong(user)).forEach(t -> result.add(convertToWeb(t)));
+
+            if (user.matches("[0-9]+")) {
+                Optional<User> userRepo = userRepository.findByUserNumber(Long.parseLong(user));
+
+                if (userRepo.isPresent()) {
+                    User userObject = userRepo.get();
+                    result = taskRepository.findByUserId(userObject.getId());
+                }
+            }
         } else if (!isBlank(text) && isAllBlank(status, team, user, value)) {
-            taskRepository.findByDescriptionContains(text).forEach(t -> result.add(convertToWeb(t)));
+            result = taskRepository.findByDescriptionContains(text);
         } else if (!isBlank(value) && value.equals("true") && isAllBlank(status, team, user, text)) {
-            taskRepository.findByIssueNotNull().forEach(t -> result.add(convertToWeb(t)));
+            result = taskRepository.findByIssueNotNull();
         } else if (!isBlank(value) && value.equals("false") && isAllBlank(status, team, user, text)) {
-            taskRepository.findByIssueNull().forEach(t -> result.add(convertToWeb(t)));
+            result = taskRepository.findByIssueNull();
         } else {
-            taskRepository.findAll().forEach(t -> result.add(convertToWeb(t)));
+            result = taskRepository.findAll();
         }
 
         return result;
     }
 
-    public Optional<TaskWeb> updateTask(Long id, TaskWeb taskWeb) {
-        validateTask(taskWeb);
-        Optional<Task> task = taskRepository.findById(id);
+    public Optional<Task> updateTask(Long id, Task task) {
+        validateTask(task);
+        Optional<Task> taskResult = taskRepository.findById(id);
 
-        if (task.isPresent()) {
-            Task updatedTask = task.get();
+        if (taskResult.isPresent()) {
+            Task updatedTask = taskResult.get();
 
-            if (!isBlank(taskWeb.getDescription()))
-                updatedTask.setDescription(taskWeb.getDescription());
+            if (!isBlank(task.getDescription()))
+                updatedTask.setDescription(task.getDescription());
 
-            if (!isBlank(taskWeb.getStatus().toString()))
-                updatedTask.setStatus(taskWeb.getStatus());
+            if (!isBlank(task.getStatus().toString()))
+                updatedTask.setStatus(task.getStatus());
 
-            return Optional.ofNullable(convertToWeb(taskRepository.save(updatedTask)));
+            return Optional.ofNullable(taskRepository.save(updatedTask));
         }
 
         return Optional.empty();
     }
 
-    public Optional<TaskWeb> assignIssue(Long id, IssueWeb issueWeb) {
+    public Optional<Task> assignIssue(Long id, Issue issue) {
         Optional<Task> task = taskRepository.findById(id);
 
         if (task.isPresent()) {
             Task updatedTask = task.get();
             validateTaskStatus(updatedTask);
-            Issue issue = issueRepository.save(new Issue(issueWeb.getDescription()));
+            Issue issueResult = issueRepository.save(new Issue(issue.getDescription()));
 
-            updatedTask.setIssue(issue);
+            updatedTask.setIssue(issueResult);
             updatedTask.setStatus(UNSTARTED);
             updatedTask = taskRepository.save(updatedTask);
 
-            return Optional.ofNullable(convertToWeb(updatedTask));
+            return Optional.ofNullable(updatedTask);
         }
 
         return Optional.empty();
     }
 
-    public Optional<TaskWeb> deleteTask(Long id) {
+    public Optional<Task> deleteTask(Long id) {
         Optional<Task> task = taskRepository.findById(id);
 
         if (task.isPresent()) {
             taskRepository.deleteById(id);
 
-            return Optional.ofNullable(convertToWeb(task.get()));
+            return Optional.ofNullable(task.get());
         }
 
         return Optional.empty();
@@ -135,15 +145,7 @@ public final class TaskService {
         return string.trim().toLowerCase();
     }
 
-    private TaskWeb convertToWeb(Task task) {
-        return new TaskWeb(task.getId(), task.getDescription(), task.getStatus(), convertIssueToWeb(task.getIssue()));
-    }
-
-    private IssueWeb convertIssueToWeb(Issue issue) {
-        return issue != null ? new IssueWeb(issue.getDescription(), issue.getIsDone()) : null;
-    }
-
-    private void validateTask(TaskWeb task) {
+    private void validateTask(Task task) {
         if (task.getStatus() == null || isBlank(task.getDescription()))
             throw new InvalidTaskException("Missing/invalid values");
     }

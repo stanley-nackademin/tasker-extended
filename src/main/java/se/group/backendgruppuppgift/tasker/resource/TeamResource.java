@@ -43,6 +43,8 @@ public final class TeamResource {
                 .build();
     }
 
+    //Todo: add user to team method
+
     @GET
     public List<Team> getAllTeams() {
         return service.getTeamService().getAllTeams();
@@ -71,7 +73,7 @@ public final class TeamResource {
     public Response assignTeamToUser(@PathParam("id") Long id, UserWeb userWeb){
         UserService userService = service.getUserService();
         return userService.addTeam(id, userWeb)
-                .map(teamWeb -> Response.status(NO_CONTENT))
+                .map(Response::ok)
                 .orElse(Response.status(NOT_FOUND))
                 .build();
     }

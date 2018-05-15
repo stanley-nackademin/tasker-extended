@@ -2,11 +2,8 @@ package se.group.backendgruppuppgift.tasker.service;
 
 import org.springframework.stereotype.Service;
 import se.group.backendgruppuppgift.tasker.model.Team;
-import se.group.backendgruppuppgift.tasker.model.User;
 import se.group.backendgruppuppgift.tasker.model.web.TeamWeb;
 import se.group.backendgruppuppgift.tasker.repository.TeamRepository;
-import se.group.backendgruppuppgift.tasker.repository.UserRepository;
-import se.group.backendgruppuppgift.tasker.service.exception.InvalidTeamException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +23,7 @@ public final class TeamService {
     }
 
     public TeamWeb createTeam(TeamWeb team) {
-        Team result = teamRepository.save(new Team(team.getName(), team.getIsActive()));
-
+        Team result = teamRepository.save(new Team(team.getName(), true));
         return convertToWeb(result);
     }
 
