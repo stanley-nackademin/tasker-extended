@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import se.group.backendgruppuppgift.tasker.model.User;
 import se.group.backendgruppuppgift.tasker.model.web.UserWeb;
-import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
+import se.group.backendgruppuppgift.tasker.resource.converter.UserConverter;
 import se.group.backendgruppuppgift.tasker.service.UserService;
 
 import javax.ws.rs.*;
@@ -16,8 +16,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
-import static javax.ws.rs.core.Response.Status.NO_CONTENT;
+import static javax.ws.rs.core.Response.Status.*;
+
+
 @Component
 @Consumes(APPLICATION_JSON)
 @Produces(APPLICATION_JSON)
@@ -27,20 +28,22 @@ public final class UserResource {
     @Context
     private UriInfo uriInfo;
 
-    @Autowired
-    private UserService service;
+    private final UserService service;
+    private final UserConverter converter = new UserConverter();
 
     public UserResource(UserService service) {
         this.service = service;
     }
 
     @POST
-    public Response createUser(UserWeb user) {
-        UserWeb result = service.createUser(user);
+    public Response createUser(UserWeb userWeb) {
+        Optional<User> user = converter.getOptionalUser(userWeb);
+        service.createUser(user.get());
+        userWeb = converter.getOptionalUserWeb(user.get()).get();
 
         return Response.created(URI.create(uriInfo
                 .getAbsolutePathBuilder()
-                .path(result.getUserNumber().toString())
+                .path(userWeb.getUserNumber().toString())
                 .toString()))
                 .build();
     }
