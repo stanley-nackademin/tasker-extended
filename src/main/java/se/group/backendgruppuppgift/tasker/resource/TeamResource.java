@@ -43,8 +43,6 @@ public final class TeamResource {
                 .build();
     }
 
-    //Todo: add user to team method
-
     @GET
     public List<Team> getAllTeams() {
         return service.getTeamService().getAllTeams();
@@ -69,10 +67,13 @@ public final class TeamResource {
     }
 
     @PUT
-    @Path("{id}/add")
+    @Path("{id}/adduser")
     public Response assignTeamToUser(@PathParam("id") Long id, UserWeb userWeb){
         UserService userService = service.getUserService();
-        return userService.addTeam(id, userWeb).map(teamWeb -> Response.status(NO_CONTENT)).orElse(Response.status(NOT_FOUND)).build();
+        return userService.addTeam(id, userWeb)
+                .map(teamWeb -> Response.status(NO_CONTENT))
+                .orElse(Response.status(NOT_FOUND))
+                .build();
     }
 
     @DELETE
@@ -82,5 +83,12 @@ public final class TeamResource {
                 .map(todo -> Response.status(NO_CONTENT))
                 .orElse(Response.status(NOT_FOUND))
                 .build();
+    }
+
+    @GET
+    @Path("{teamName}/users")
+    public Response getAllUsersInTeam(@PathParam("teamName") String name){
+
+        return Response.ok(service.getTeamService().getAllUserByTeamName(name)).build();
     }
 }
