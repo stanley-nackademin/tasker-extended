@@ -2,11 +2,8 @@ package se.group.backendgruppuppgift.tasker.service;
 
 import org.springframework.stereotype.Service;
 import se.group.backendgruppuppgift.tasker.model.Team;
-import se.group.backendgruppuppgift.tasker.model.User;
 import se.group.backendgruppuppgift.tasker.model.web.TeamWeb;
 import se.group.backendgruppuppgift.tasker.repository.TeamRepository;
-import se.group.backendgruppuppgift.tasker.repository.UserRepository;
-import se.group.backendgruppuppgift.tasker.service.exception.InvalidTeamException;
 
 import java.util.List;
 import java.util.Optional;

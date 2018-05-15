@@ -7,7 +7,7 @@ import java.util.Optional;
 public final class UserWeb {
 
     private Long userNumber;
-    private String userName;
+    private String username;
     private String firstName;
     private String lastName;
     private Boolean isActive;
@@ -16,9 +16,9 @@ public final class UserWeb {
     protected UserWeb() {
     }
 
-    public UserWeb(Long userNumber, String userName, String firstName, String lastName, Boolean isActive, Team team) {
+    public UserWeb(Long userNumber, String username, String firstName, String lastName, Boolean isActive, Team team) {
         this.userNumber = userNumber;
-        this.userName = userName;
+        this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.isActive = isActive;
@@ -29,8 +29,8 @@ public final class UserWeb {
         return userNumber;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
     public String getFirstName() {
@@ -53,7 +53,7 @@ public final class UserWeb {
     public String toString() {
         return "UserWeb{" +
                 "userNumber=" + userNumber +
-                ", username='" + userName + '\'' +
+                ", username='" + username + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", isActive=" + isActive +
@@ -61,10 +61,9 @@ public final class UserWeb {
                 '}';
     }
 
-    public static Optional<UserWeb> getOptionalFromUser(User user){
-        UserWeb userWeb = new UserWeb(user.getUserNumber(), user.getUsername()
-                , user.getFirstName(), user.getLastName()
-                , user.getIsActive(), user.getTeam());
-        return Optional.ofNullable(userWeb);
+    public Optional<User> getOptionalFromUser(UserWeb userWeb){
+        User user = new User(userWeb.getUserNumber(), userWeb.getUsername()
+                , userWeb.getFirstName(), userWeb.getLastName(), userWeb.getTeam());
+        return Optional.ofNullable(user);
     }
 }

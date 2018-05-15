@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 
+
 @Service
 public final class UserService {
 
@@ -44,11 +45,11 @@ public final class UserService {
         AtomicLong number = new AtomicLong(userNumber);
         userNumber = number.incrementAndGet();
 
-        UserWeb userWeb = new UserWeb(userNumber, user.getUserName()
+        UserWeb userWeb = new UserWeb(userNumber, user.getUsername()
                 ,user.getFirstName(), user.getLastName()
                 ,user.getIsActive(), user.getTeam());
 
-        User entityUser = new User(userWeb.getUserNumber(), userWeb.getUserName(), userWeb.getFirstName(), userWeb.getLastName(), null);
+        User entityUser = new User(userWeb.getUserNumber(), userWeb.getUsername(), userWeb.getFirstName(), userWeb.getLastName(), null);
         entityUser.setIsActive(true);
         repository.save(entityUser);
         return userWeb;
@@ -57,8 +58,8 @@ public final class UserService {
     public Optional<UserWeb> findUserByUserNumber(Long userNumber){
         Optional<User> user = repository.findByUserNumber(userNumber);
         if(user.isPresent()){
-            User user2 = user.get();
-            return UserWeb.getOptionalFromUser(user2);
+            Optional<UserWeb> userWeb = Optional.ofNullable(convertToWeb(user.get()));
+            return userWeb;
         }
         return Optional.empty();
     }
@@ -70,6 +71,13 @@ public final class UserService {
         }
         return user;
     }
+
+    private UserWeb convertToWeb(User user) {
+        return new UserWeb(user.getUserNumber(),user.getUsername()
+                ,user.getFirstName(),user.getLastName()
+                , user.getIsActive(), user.getTeam());
+    }
+
 
     public User findLastUser(){
         return repository.findFirstByOrderByUserNumberDesc().get();
@@ -169,12 +177,6 @@ public final class UserService {
 
     private TeamWeb convertToTeamWeb(Team team) {
         return new TeamWeb(team.getId(), team.getName(), team.getIsActive());
-    }
-
-    private UserWeb convertToWeb(User user) {
-        return new UserWeb(user.getUserNumber(),user.getUsername()
-                ,user.getFirstName(),user.getLastName()
-                , user.getIsActive(), user.getTeam());
     }
 
     private TaskWeb convertTaskToWeb(Task task) {
