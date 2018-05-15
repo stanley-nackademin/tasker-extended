@@ -61,10 +61,15 @@ public final class UserWeb {
                 '}';
     }
 
-    public static Optional<UserWeb> getOptionalFromUser(User user){
-        UserWeb userWeb = new UserWeb(user.getUserNumber(), user.getUsername()
-                , user.getFirstName(), user.getLastName()
-                , user.getIsActive(), user.getTeam());
-        return Optional.ofNullable(userWeb);
+    public Optional<User> getOptionalFromUser(UserWeb webUser){
+        User user = new User(webUser.getUserNumber(), webUser.getUserName()
+                , webUser.getFirstName(), webUser.getLastName()
+                ,  webUser.getTeam());
+        return Optional.ofNullable(user);
     }
+
+//    public Optional<UserWeb> convertToWeb(User user) {
+//        return Optional.ofNullable(Optional<UserWeb>(user.getUserNumber(), user.getUsername(), user.getFirstName(), user.getLastName(),user.getIsActive(), user.getTeam());)
+//
+//    }
 }

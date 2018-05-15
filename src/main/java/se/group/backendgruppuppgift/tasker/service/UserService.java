@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static org.apache.commons.lang3.StringUtils.*;
 
 @Service
 public final class UserService {
@@ -57,8 +58,8 @@ public final class UserService {
     public Optional<UserWeb> findUserByUserNumber(Long userNumber){
         Optional<User> user = repository.findByUserNumber(userNumber);
         if(user.isPresent()){
-            User user2 = user.get();
-            return UserWeb.getOptionalFromUser(user2);
+            Optional<UserWeb> userWeb = Optional.ofNullable(convertToWeb(user.get()));
+            return userWeb;
         }
         return Optional.empty();
     }
@@ -94,9 +95,46 @@ public final class UserService {
         return repository.save(newUser);
     }
 
-    public User updateUser(User user){
-        return repository.save(user);
+    public Optional<User> updateUser(Long userNumber, UserWeb userWeb){
+        //Optional<User> user = userWeb.getOptionalFromUser(userWeb);
+        Optional<User> user = repository.findByUserNumber(userNumber);
+
+        if(user.isPresent()){
+            User updatedUser = user.get();
+            if (!isBlank(userWeb.getUserName()))
+                updatedUser.setUsername(userWeb.getUserName());
+            if(!isBlank(userWeb.getFirstName()))
+                updatedUser.setFirstName(userWeb.getFirstName());
+            if(!isBlank(userWeb.getLastName()))
+                updatedUser.setLastName(userWeb.getLastName());
+            if (updatedUser.getIsActive() != null)
+                updatedUser.setIsActive(userWeb.getIsActive());
+
+            return Optional.ofNullable(userWeb.getOptionalFromUser(repository.save(updatedUser)));
+                    //Optional.ofNullable(userWeb.convertToWeb(repository.save(updatedUser)));
+        }
+        return Optional.empty();
     }
+    /*
+    public Optional<TaskWeb> updateTask(Long id, TaskWeb taskWeb) {
+        validateTask(taskWeb);
+        Optional<Task> task = taskRepository.findById(id);
+
+        if (task.isPresent()) {
+            Task updatedTask = task.get();
+
+            if (!isBlank(taskWeb.getDescription()))
+                updatedTask.setDescription(taskWeb.getDescription());
+
+            if (!isBlank(taskWeb.getStatus().toString()))
+                updatedTask.setStatus(taskWeb.getStatus());
+
+            return Optional.ofNullable(convertToWeb(taskRepository.save(updatedTask)));
+        }
+
+        return Optional.empty();
+    }
+     */
 
     // -------------------------------TODO DENNA ÄR INTE KLAR.
     public Optional<TaskWeb> updateUserTask(Long userNumber, Long taskId){

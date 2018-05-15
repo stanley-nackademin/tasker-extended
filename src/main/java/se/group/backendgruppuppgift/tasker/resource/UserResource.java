@@ -53,9 +53,9 @@ public final class UserResource {
     }
 
     @PUT
-    @Path("{id}")
-    public Response updateUser(@PathParam("id") Long id, User user){
-        service.updateUser(user);
+    @Path("{usernumber}")
+    public Response updateUser(@PathParam("usernumber") Long userNumber, UserWeb user){
+        service.updateUser(userNumber, user);
         return Response.status(NO_CONTENT).build();
     }
 
