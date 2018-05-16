@@ -24,6 +24,11 @@ public final class Task {
 
     protected Task() {}
 
+    public Task(String description) {
+        this.description = description;
+        this.status = TaskStatus.UNSTARTED;
+    }
+
     public Task(String description, TaskStatus status) {
         this.description = description;
         this.status = status;

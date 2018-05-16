@@ -5,7 +5,7 @@ import se.group.backendgruppuppgift.tasker.model.Issue;
 import se.group.backendgruppuppgift.tasker.model.Task;
 import se.group.backendgruppuppgift.tasker.model.web.IssueWeb;
 import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
-import se.group.backendgruppuppgift.tasker.service.MasterService;
+import se.group.backendgruppuppgift.tasker.service.TaskService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -27,16 +27,16 @@ public final class TaskResource {
     @Context
     private UriInfo uriInfo;
 
-    private final MasterService service;
+    private final TaskService taskService;
 
-    public TaskResource(MasterService service) {
-        this.service = service;
+    public TaskResource(TaskService taskService) {
+        this.taskService = taskService;
     }
 
     @POST
     public Response createTask(TaskWeb taskWeb) {
-        Task result = service.getTaskService().createTask(convertToTaskObject(taskWeb));
-        TaskWeb webResult = convertToWeb(result);
+        Task result = taskService.createTask(convertToTask(taskWeb));
+        TaskWeb webResult = convertToTaskWeb(result);
 
         return Response.created(URI.create(uriInfo
                 .getAbsolutePathBuilder()
@@ -48,8 +48,8 @@ public final class TaskResource {
     @GET
     @Path("{id}")
     public Response findTask(@PathParam("id") Long id) {
-        return service.getTaskService().findTask(id)
-                .map(t -> Response.ok(convertToWeb(t)))
+        return taskService.findTask(id)
+                .map(t -> Response.ok(convertToTaskWeb(t)))
                 .orElse(Response.status(NOT_FOUND))
                 .build();
     }
@@ -63,8 +63,8 @@ public final class TaskResource {
             @QueryParam("issue") String value) {
 
         List<TaskWeb> result = new ArrayList<>();
-        service.getTaskService().findTasksByParams(status, team, user, text, value)
-                .forEach(t -> result.add(convertToWeb(t)));
+        taskService.findTasksByParams(status, team, user, text, value)
+                .forEach(t -> result.add(convertToTaskWeb(t)));
 
         return result;
     }
@@ -72,8 +72,8 @@ public final class TaskResource {
     @PUT
     @Path("{id}")
     public Response updateTask(@PathParam("id") Long id, TaskWeb taskWeb) {
-        return service.getTaskService().updateTask(id, convertToTaskObject(taskWeb))
-                .map(t -> Response.ok(convertToWeb(t)))
+        return taskService.updateTask(id, convertToTask(taskWeb))
+                .map(t -> Response.ok(convertToTaskWeb(t)))
                 .orElse(Response.status(NOT_FOUND))
                 .build();
     }
@@ -81,8 +81,8 @@ public final class TaskResource {
     @PUT
     @Path("{id}/issue")
     public Response assignIssue(@PathParam("id") Long id, IssueWeb issueWeb) {
-        return service.getTaskService().assignIssue(id, convertToIssueObject(issueWeb))
-                .map(t -> Response.ok(convertToWeb(t)))
+        return taskService.assignIssue(id, convertToIssue(issueWeb))
+                .map(t -> Response.ok(convertToTaskWeb(t)))
                 .orElse(Response.status(NOT_FOUND))
                 .build();
     }
@@ -90,21 +90,21 @@ public final class TaskResource {
     @DELETE
     @Path("{id}")
     public Response deleteTask(@PathParam("id") Long id) {
-        return service.getTaskService().deleteTask(id)
+        return taskService.deleteTask(id)
                 .map(t -> Response.noContent())
                 .orElse(Response.status(NOT_FOUND))
                 .build();
     }
 
-    private Task convertToTaskObject(TaskWeb taskWeb) {
+    private Task convertToTask(TaskWeb taskWeb) {
         return new Task(taskWeb.getDescription(), taskWeb.getStatus());
     }
 
-    private Issue convertToIssueObject(IssueWeb issueWeb) {
+    private Issue convertToIssue(IssueWeb issueWeb) {
         return new Issue(issueWeb.getDescription());
     }
 
-    private TaskWeb convertToWeb(Task task) {
+    private TaskWeb convertToTaskWeb(Task task) {
         return new TaskWeb(task.getId(), task.getDescription(), task.getStatus(), convertIssueToWeb(task.getIssue()));
     }
 

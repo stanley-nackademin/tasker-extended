@@ -32,39 +32,29 @@ public final class TaskService {
 
     public Task createTask(Task task) {
         validateTask(task);
-        Task taskResult = taskRepository.save(new Task(task.getDescription(), task.getStatus()));
+        Task result = taskRepository.save(new Task(task.getDescription(), task.getStatus()));
 
-        return taskResult;
+        return result;
     }
 
     public Optional<Task> findTask(Long id) {
-        Optional<Task> task = taskRepository.findById(id);
+        Optional<Task> result = taskRepository.findById(id);
 
-        if (task.isPresent())
-            return Optional.ofNullable(task.get());
+        if (result.isPresent())
+            return Optional.ofNullable(result.get());
 
         return Optional.empty();
     }
 
     public List<Task> findTasksByParams(String status, String team, String user, String text, String value) {
-        List<Task> result = new ArrayList<>();
+        List<Task> result;
 
         if (!isBlank(status) && isAllBlank(team, user, text, value)) {
             result = findTasksByStatus(status);
         } else if (!isBlank(team) && isAllBlank(status, user, text, value)) {
-
-            return findByTeamId(team);
-
+            result = findByTeamId(team);
         } else if (!isBlank(user) && isAllBlank(status, team, text, value)) {
-
-            if (user.matches("[0-9]+")) {
-                Optional<User> userRepo = userRepository.findByUserNumber(Long.parseLong(user));
-
-                if (userRepo.isPresent()) {
-                    User userObject = userRepo.get();
-                    result = taskRepository.findByUserId(userObject.getId());
-                }
-            }
+            result = findByUserNumber(user);
         } else if (!isBlank(text) && isAllBlank(status, team, user, value)) {
             result = taskRepository.findByDescriptionContains(text);
         } else if (!isBlank(value) && value.equals("true") && isAllBlank(status, team, user, text)) {
@@ -157,19 +147,33 @@ public final class TaskService {
             throw new InvalidTaskException("The current Task's status is not DONE");
     }
 
-    private List<Task> findByTeamId(String team){
+    private List<Task> findByTeamId(String team) {
         List<Task> taskList = new ArrayList<>();
 
-        if(team.matches("[0-9]+")){
+        if (team.matches("[0-9]+")) {
             Long teamId = Long.parseLong(team);
             List<User> userList = userRepository.findUsersByTeamId(teamId);
 
-            for(User u : userList){
+            for (User u : userList) {
                 Long id = u.getId();
                 List<Task> tasks = taskRepository.findByUserId(id);
                 taskList.addAll(tasks);
             }
         }
+
         return taskList;
+    }
+
+    private List<Task> findByUserNumber(String userNumber) {
+        List<Task> result = new ArrayList<>();
+
+        if (userNumber.matches("[0-9]+")) {
+            Optional<User> user = userRepository.findByUserNumber(Long.parseLong(userNumber));
+
+            if (user.isPresent())
+                result = taskRepository.findByUserId(user.get().getId());
+        }
+
+        return result;
     }
 }
