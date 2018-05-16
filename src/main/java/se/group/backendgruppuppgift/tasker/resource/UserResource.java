@@ -130,6 +130,6 @@ public final class UserResource {
     }
 
     private IssueWeb convertIssueToWeb(Issue issue) {
-        return issue != null ? new IssueWeb(issue.getDescription(), issue.getIsDone()) : null;
+        return issue != null ? new IssueWeb(issue.getDescription()) : null;
     }
 }

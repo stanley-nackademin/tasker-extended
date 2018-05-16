@@ -12,14 +12,10 @@ public final class Issue {
     @Column(nullable = false)
     private String description;
 
-    @Column(nullable = false)
-    private boolean isDone;
-
     protected Issue() {}
 
     public Issue(String description) {
         this.description = description;
-        this.isDone = false;
     }
 
     public Long getId() {
@@ -30,23 +26,15 @@ public final class Issue {
         return description;
     }
 
-    public boolean getIsDone() {
-        return isDone;
-    }
-
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public void setIsDone(boolean done) {
-        isDone = done;
     }
 
     @Override
     public String toString() {
         return String.format(
-                "Issue[id=%d, description='%s', isDone='%s']",
-                id, description, isDone
+                "Issue[id=%d, description='%s']",
+                id, description
         );
     }
 }
