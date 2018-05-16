@@ -52,7 +52,9 @@ public final class TaskService {
         if (!isBlank(status) && isAllBlank(team, user, text, value)) {
             result = findTasksByStatus(status);
         } else if (!isBlank(team) && isAllBlank(status, user, text, value)) {
-            // TODO: 2018-05-15  
+
+            return findByTeamId(team);
+
         } else if (!isBlank(user) && isAllBlank(status, team, text, value)) {
 
             if (user.matches("[0-9]+")) {
@@ -153,5 +155,21 @@ public final class TaskService {
     private void validateTaskStatus(Task task) {
         if (!(task.getStatus() == DONE))
             throw new InvalidTaskException("The current Task's status is not DONE");
+    }
+
+    private List<Task> findByTeamId(String team){
+        List<Task> taskList = new ArrayList<>();
+
+        if(team.matches("[0-9]+")){
+            Long teamId = Long.parseLong(team);
+            List<User> userList = userRepository.findUsersByTeamId(teamId);
+
+            for(User u : userList){
+                Long id = u.getId();
+                List<Task> tasks = taskRepository.findByUserId(id);
+                taskList.addAll(tasks);
+            }
+        }
+        return taskList;
     }
 }

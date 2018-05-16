@@ -159,6 +159,28 @@ public final class UserService {
         return Optional.empty();
     }
 
+    public Optional<Task> assignTaskToUser(Long userNumber, Long taskId){
+
+        Optional<User> user = repository.findByUserNumber(userNumber);
+        Optional<Task> task =taskRepository.findById(taskId);
+
+        User userResult = null;
+        Task taskResult = null;
+
+        if(user.isPresent()){
+            userResult = user.get();
+            if(task.isPresent()){
+                taskResult = task.get();
+            }
+
+            taskResult.setUser(userResult);
+        }
+
+
+
+        return Optional.ofNullable(taskRepository.save(taskResult));
+    }
+
     private void maxUserLimitValidation(Team team) {
         List<User> users = repository.findByTeam(team);
 

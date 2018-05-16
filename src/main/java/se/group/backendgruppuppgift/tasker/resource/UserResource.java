@@ -2,7 +2,10 @@ package se.group.backendgruppuppgift.tasker.resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import se.group.backendgruppuppgift.tasker.model.Issue;
+import se.group.backendgruppuppgift.tasker.model.Task;
 import se.group.backendgruppuppgift.tasker.model.User;
+import se.group.backendgruppuppgift.tasker.model.web.IssueWeb;
 import se.group.backendgruppuppgift.tasker.model.web.UserWeb;
 import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
 import se.group.backendgruppuppgift.tasker.service.UserService;
@@ -102,5 +105,31 @@ public final class UserResource {
 //                .build();
         service.userActivator(userNumber);
         return Response.status(NO_CONTENT).build();
+    }
+
+    @PUT
+    @Path("{userNumber}/tasks")
+    public Response addTaskToUser(@PathParam("userNumber") Long userNumber, TaskWeb taskweb){
+
+        service.assignTaskToUser(userNumber, taskweb.getId());
+        return service.assignTaskToUser(userNumber, taskweb.getId()).map(t -> Response.ok(convertToWeb(t)))
+                .orElse(Response.status(NOT_FOUND))
+                .build();
+    }
+
+    private Task convertToTaskObject(TaskWeb taskWeb) {
+        return new Task(taskWeb.getDescription(), taskWeb.getStatus());
+    }
+
+    private Issue convertToIssueObject(IssueWeb issueWeb) {
+        return new Issue(issueWeb.getDescription());
+    }
+
+    private TaskWeb convertToWeb(Task task) {
+        return new TaskWeb(task.getId(), task.getDescription(), task.getStatus(), convertIssueToWeb(task.getIssue()));
+    }
+
+    private IssueWeb convertIssueToWeb(Issue issue) {
+        return issue != null ? new IssueWeb(issue.getDescription(), issue.getIsDone()) : null;
     }
 }
