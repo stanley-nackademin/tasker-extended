@@ -103,19 +103,21 @@ public final class UserService {
         return repository.save(newUser);
     }
 
-    public Optional<User> updateUser(Long userNumber, UserWeb userWeb){
-        Optional<User> user = repository.findByUserNumber(userNumber);
+    //Ta emot user istället för webuser
+    public Optional<User> updateUser(Long userNumber, User user){
+        //UserConverter.getOptionalUserWeb(user);
+        Optional<User> result = repository.findByUserNumber(userNumber);
 
-        if(user.isPresent()){
-            User updatedUser = user.get();
-            if(!isBlank(userWeb.getFirstName()))
-                updatedUser.setFirstName(userWeb.getFirstName());
-            if(!isBlank(userWeb.getLastName()))
-                updatedUser.setLastName(userWeb.getLastName());
-            if (userWeb.getIsActive() != null)
-                updatedUser.setIsActive(userWeb.getIsActive());
-            if (!isBlank(userWeb.getTeam().getId().toString()))
-                updatedUser.setTeam(userWeb.getTeam());
+        if(result.isPresent()){
+            User updatedUser = result.get();
+            if(!isBlank(user.getFirstName()))
+                updatedUser.setFirstName(user.getFirstName());
+            if(!isBlank(user.getLastName()))
+                updatedUser.setLastName(user.getLastName());
+            if (user.getIsActive() != null)
+                updatedUser.setIsActive(user.getIsActive());
+            if (!isBlank(user.getTeam().getId().toString()))
+                updatedUser.setTeam(user.getTeam());
             return Optional.ofNullable(repository.save(updatedUser));
         }
         return Optional.empty();
