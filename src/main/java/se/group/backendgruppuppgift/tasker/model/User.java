@@ -28,7 +28,8 @@ public final class User {
     @JoinColumn(name = "team_id")
     private Team team;
 
-    protected User() {}
+    protected User() {
+    }
 
     public User(Long userNumber, String username, String firstName, String lastName, Team team) {
         this.userNumber = userNumber;
@@ -46,6 +47,10 @@ public final class User {
         return userNumber;
     }
 
+    public void setUserNumber(Long userNumber) {
+        this.userNumber = userNumber;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -54,40 +59,32 @@ public final class User {
         return firstName;
     }
 
-    public String getLastName() {
-        return lastName;
-    }
-
-    public Boolean getIsActive() {
-        return isActive;
-    }
-
-    public Team getTeam() {
-        return team;
-    }
-
-    public void setUserNumber(Long userNumber) {
-        this.userNumber = userNumber;
-    }
-
     public void setFirstName(String firstName) {
         this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
     }
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
     public void setIsActive(boolean active) {
         isActive = active;
     }
 
-    public void setTeam(Team team) {
-        this.team = team;
+    public Team getTeam() {
+        return team;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setTeam(Team team) {
+        this.team = team;
     }
 
     @Override

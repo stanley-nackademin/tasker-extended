@@ -1,8 +1,6 @@
 package se.group.backendgruppuppgift.tasker.model.web;
 
-import se.group.backendgruppuppgift.tasker.model.*;
-
-import java.util.Optional;
+import se.group.backendgruppuppgift.tasker.model.Team;
 
 public final class UserWeb {
 

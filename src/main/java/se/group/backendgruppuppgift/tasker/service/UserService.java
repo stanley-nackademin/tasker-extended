@@ -1,32 +1,23 @@
 package se.group.backendgruppuppgift.tasker.service;
 
 import org.springframework.stereotype.Service;
-import se.group.backendgruppuppgift.tasker.model.Task;
-import se.group.backendgruppuppgift.tasker.model.TaskStatus;
-import se.group.backendgruppuppgift.tasker.model.Team;
-import se.group.backendgruppuppgift.tasker.model.User;
-import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
-import se.group.backendgruppuppgift.tasker.model.web.UserWeb;
-import se.group.backendgruppuppgift.tasker.repository.TaskRepository;
-import se.group.backendgruppuppgift.tasker.model.web.TeamWeb;
-import se.group.backendgruppuppgift.tasker.repository.TeamRepository;
-import se.group.backendgruppuppgift.tasker.repository.UserRepository;
-import se.group.backendgruppuppgift.tasker.resource.converter.UserConverter;
-import se.group.backendgruppuppgift.tasker.service.exception.InvalidUserException;
-import se.group.backendgruppuppgift.tasker.service.exception.InvalidTeamException;
+import se.group.backendgruppuppgift.tasker.model.*;
+import se.group.backendgruppuppgift.tasker.model.web.*;
+import se.group.backendgruppuppgift.tasker.repository.*;
+import se.group.backendgruppuppgift.tasker.service.exception.*;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 
 @Service
 public final class UserService {
 
     private final UserRepository repository;
-    private  final TeamRepository teamRepository;
+    private final TeamRepository teamRepository;
     private final TaskRepository taskRepository;
 
     public UserService(UserRepository repository, TeamRepository teamRepository, TaskRepository taskRepository) {
@@ -35,14 +26,17 @@ public final class UserService {
         this.taskRepository = taskRepository;
     }
 
+    //CREATE
+
     public User createUser(User user) {
         Long userNumber;
         Optional<User> optionalUser = repository.findFirstByOrderByUserNumberDesc();
 
-        if(optionalUser.isPresent())
-           userNumber = repository.findFirstByOrderByUserNumberDesc().get().getUserNumber();
-        else
+        if (optionalUser.isPresent()){
+            userNumber = repository.findFirstByOrderByUserNumberDesc().get().getUserNumber();
+        }else{
             userNumber = 1000L;
+        }
 
         AtomicLong number = new AtomicLong(userNumber);
         userNumber = number.incrementAndGet();
@@ -50,46 +44,82 @@ public final class UserService {
         user.setUserNumber(userNumber);
         user.setIsActive(true);
 
-        if(repository.findUserByUsername(user.getUsername()).isPresent())
+        if (repository.findUserByUsername(user.getUsername()).isPresent()){
             throw new InvalidUserException("Username already in use");
+        }
 
+        checkUsername(user);
         repository.save(user);
         return user;
     }
 
-    public Optional<User> findUserByUserNumber(Long userNumber){
+    //READ
+
+    public Optional<User> findUserByUserNumber(Long userNumber) {
         Optional<User> user = repository.findByUserNumber(userNumber);
-        if(user.isPresent()){
+
+        if (user.isPresent()) {
             return user;
         }
         return Optional.empty();
     }
 
-    public Optional<User> deleteUserByUserNumber(Long userNumber){
-        Optional<User> user = findUserByUserNumber(userNumber);
-        if(user.isPresent()){
-            repository.removeByUserNumber(userNumber);
-        }
-        return user;
-    }
-
-    public User findLastUser(){
+    public User findLastUser() {
         return repository.findFirstByOrderByUserNumberDesc().get();
     }
 
-    public List<User> findUsersByTeamId(Long teamId){
+    public List<User> findUsersByTeamId(Long teamId) {
         return repository.findUsersByTeamId(teamId);
     }
 
-    public User userActivator(Long userNumber){
+    public List<User> findAllUsersBy(String firstName, String lastName, String userName) {
+        System.out.println(firstName + lastName + userName);
+        if (!firstName.isEmpty() && lastName.isEmpty() && userName.isEmpty()) {
+            return repository.findUsersByFirstName(firstName);
+        } else if (firstName.isEmpty() && !lastName.isEmpty() && userName.isEmpty()) {
+            return repository.findUsersByLastName(lastName);
+        } else if (firstName.isEmpty() && lastName.isEmpty() && !userName.isEmpty()) {
+            return repository.findUsersByUsername(userName);
+        } else if (!firstName.isEmpty() && !lastName.isEmpty() && userName.isEmpty()) {
+            return repository.findUsersByFirstNameAndLastName(firstName, lastName);
+        } else if (!firstName.isEmpty() && lastName.isEmpty() && !userName.isEmpty()) {
+            return repository.findUsersByFirstNameAndUsername(firstName, userName);
+        } else if (firstName.isEmpty() && !lastName.isEmpty() && !userName.isEmpty()) {
+            return repository.findUsersByUsernameAndLastName(userName, lastName);
+        } else {
+            return repository.findUsersByFirstNameAndLastNameAndUsername(firstName, lastName, userName);
+        }
+    }
+
+    //UPDATE
+
+    public Optional<User> updateUser(Long userNumber, User user) {
+        Optional<User> result = repository.findByUserNumber(userNumber);
+
+        if (result.isPresent()) {
+            User updatedUser = result.get();
+            if (!isBlank(user.getFirstName()))
+                updatedUser.setFirstName(user.getFirstName());
+            if (!isBlank(user.getLastName()))
+                updatedUser.setLastName(user.getLastName());
+            if (user.getIsActive() != null)
+                updatedUser.setIsActive(user.getIsActive());
+            if (user.getTeam() != null && !isBlank(user.getTeam().getId().toString()))
+                updatedUser.setTeam(user.getTeam());
+
+            return Optional.ofNullable(repository.save(updatedUser));
+        }
+        return Optional.empty();
+    }
+
+    public User userActivator(Long userNumber) {
         Optional<User> newUserOpt = repository.findByUserNumber(userNumber);
         User newUser = newUserOpt.get();
         newUser.setIsActive(newUser.getIsActive() == true ? false : true);
 
-        newUser.setIsActive(newUser.getIsActive() == true ? false : true);
-        if(newUser.getIsActive() == false){
+        if (newUser.getIsActive() == false) {
             List<Task> task = taskRepository.findAllByUserUserNumber(newUser.getUserNumber());
-            for(Task t: task){
+            for (Task t : task) {
                 t.setStatus(TaskStatus.UNSTARTED);
                 t.setUser(null);
                 taskRepository.save(t);
@@ -98,68 +128,29 @@ public final class UserService {
         return repository.save(newUser);
     }
 
-    //Ta emot user istället för webuser
-    public Optional<User> updateUser(Long userNumber, User user){
-        //UserConverter.getOptionalUserWeb(user);
-        Optional<User> result = repository.findByUserNumber(userNumber);
-
-        if(result.isPresent()){
-            User updatedUser = result.get();
-            if(!isBlank(user.getFirstName()))
-                updatedUser.setFirstName(user.getFirstName());
-            if(!isBlank(user.getLastName()))
-                updatedUser.setLastName(user.getLastName());
-            if (user.getIsActive() != null)
-                updatedUser.setIsActive(user.getIsActive());
-            if (!isBlank(user.getTeam().getId().toString()))
-                updatedUser.setTeam(user.getTeam());
-            return Optional.ofNullable(repository.save(updatedUser));
-        }
-        return Optional.empty();
-    }
-
-    // -------------------------------TODO DENNA ÄR INTE KLAR.
-    public Optional<TaskWeb> updateUserTask(Long userNumber, Long taskId){
+    public Optional<TaskWeb> updateUserTask(Long userNumber, Long taskId) {
         Optional<User> userResult = repository.findByUserNumber(userNumber);
         Optional<Task> taskResult = taskRepository.findById(taskId);
 
-        if(taskResult.isPresent()){
+        if (taskResult.isPresent()) {
             Task updatedTask = taskResult.get();
             User updatedUser = userResult.get();
             updatedTask.setUser(updatedUser);
+            updatedTask.setStatus(TaskStatus.STARTED);
             return Optional.ofNullable(convertTaskToWeb(taskRepository.save(updatedTask)));
         }
         return Optional.empty();
     }
 
-    public List<User> findAllUsersBy(String firstName, String lastName, String userName){
-        System.out.println(firstName + lastName + userName);
-        if (!firstName.isEmpty() && lastName.isEmpty() && userName.isEmpty()){ // om allt är null förutom firstname
-           return repository.findUsersByFirstName(firstName);
-        }else if(firstName.isEmpty() && !lastName.isEmpty() && userName.isEmpty()){ // om allt är null förutom lastname
-            return repository.findUsersByLastName(lastName);
-        }else if(firstName.isEmpty() && lastName.isEmpty() && !userName.isEmpty()){ // om allt är null förutom username
-            return repository.findUsersByUsername(userName);
-        }else if (!firstName.isEmpty() && !lastName.isEmpty() && userName.isEmpty()){ // om allt är null förutom firsntame och lastname
-            return repository.findUsersByFirstNameAndLastName(firstName,lastName);
-        }else if (!firstName.isEmpty() && lastName.isEmpty() && !userName.isEmpty()){ // om allt är null förutom firstNAme och username
-            return repository.findUsersByFirstNameAndUsername(firstName,userName);
-        }else if(firstName.isEmpty() && !lastName.isEmpty() && !userName.isEmpty()){ // om firstname är null
-            return repository.findUsersByUsernameAndLastName(userName, lastName);
-        }else
-            {return repository.findUsersByFirstNameAndLastNameAndUsername(firstName, lastName, userName);
-        }
-    }
-
-    public Optional<TeamWeb> addTeam(Long id, UserWeb userWeb){
+    public Optional<TeamWeb> addTeam(Long id, UserWeb userWeb) {
         Optional<User> result = repository.findByUserNumber(userWeb.getUserNumber());
         Optional<Team> resultTeam = teamRepository.findById(id);
 
-        if(result.isPresent()){
+        if (result.isPresent()) {
             User user = result.get();
             userTeamValidation(user);
 
-            if(resultTeam.isPresent()){
+            if (resultTeam.isPresent()) {
                 Team team = resultTeam.get();
                 maxUserLimitValidation(team);
                 user.setTeam(team);
@@ -171,6 +162,18 @@ public final class UserService {
         return Optional.empty();
     }
 
+    //DELETE
+
+    public Optional<User> deleteUserByUserNumber(Long userNumber) {
+        Optional<User> user = findUserByUserNumber(userNumber);
+        if (user.isPresent()) {
+            repository.removeByUserNumber(userNumber);
+        }
+        return user;
+    }
+
+
+
     private void maxUserLimitValidation(Team team) {
         List<User> users = repository.findByTeam(team);
 
@@ -180,11 +183,9 @@ public final class UserService {
     }
 
     private void userTeamValidation(User user) {
-
         if (user.getTeam() != null) {
             throw new InvalidTeamException("User: " + user.getUsername() + " is already in a team");
         }
-
     }
 
     private TeamWeb convertToTeamWeb(Team team) {
@@ -195,8 +196,8 @@ public final class UserService {
         return new TaskWeb(task.getId(), task.getDescription(), task.getStatus(), null);
     }
 
-    private void checkUsername(User user){
-        if(user.getFirstName() == null || user.getFirstName().length() <= 10){
+    private void checkUsername(User user) {
+        if (user.getFirstName() == null || user.getFirstName().length() <= 10) {
             throw new InvalidUserException("FirstName needs to be 10 characters or longer!");
         }
     }
