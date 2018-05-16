@@ -21,8 +21,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     List<User> findByTeam(Team team);
 
-    List<User> findUsersByTeam(Team team);
-
     Optional<User> findFirstByOrderByUserNumberDesc();
 
     List<User> findUsersByFirstName(String firstName);
