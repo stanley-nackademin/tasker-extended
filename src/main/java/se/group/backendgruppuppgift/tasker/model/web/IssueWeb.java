@@ -16,7 +16,7 @@ public final class IssueWeb {
         return description;
     }
 
-    public boolean isDone() {
+    public boolean getIsDone() {
         return isDone;
     }
 
