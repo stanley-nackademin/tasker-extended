@@ -6,7 +6,8 @@ public final class TeamWeb {
     private String name;
     private Boolean isActive;
 
-    protected TeamWeb() {}
+    protected TeamWeb() {
+    }
 
     public TeamWeb(Long id, String name, Boolean isActive) {
         this.id = id;

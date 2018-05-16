@@ -36,4 +36,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
     List<User> findUsersByUsernameAndLastName(String userName, String lastName);
 
     List<User> findUsersByFirstNameAndLastNameAndUsername(String firstName, String lastName, String userName);
+
+    Optional<User> findUserByUsername(String username);
 }

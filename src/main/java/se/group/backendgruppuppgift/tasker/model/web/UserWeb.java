@@ -1,8 +1,6 @@
 package se.group.backendgruppuppgift.tasker.model.web;
 
-import se.group.backendgruppuppgift.tasker.model.*;
-
-import java.util.Optional;
+import se.group.backendgruppuppgift.tasker.model.Team;
 
 public final class UserWeb {
 
@@ -61,9 +59,4 @@ public final class UserWeb {
                 '}';
     }
 
-    public Optional<User> getOptionalFromUser(UserWeb userWeb){
-        User user = new User(userWeb.getUserNumber(), userWeb.getUsername()
-                , userWeb.getFirstName(), userWeb.getLastName(), userWeb.getTeam());
-        return Optional.ofNullable(user);
-    }
 }

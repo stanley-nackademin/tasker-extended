@@ -4,7 +4,8 @@ public final class IssueWeb {
 
     private String description;
 
-    protected IssueWeb() {}
+    protected IssueWeb() {
+    }
 
     public IssueWeb(String description) {
         this.description = description;

@@ -9,7 +9,8 @@ public final class TaskWeb {
     private TaskStatus status;
     private IssueWeb issue;
 
-    protected TaskWeb() {}
+    protected TaskWeb() {
+    }
 
     public TaskWeb(Long id, String description, TaskStatus status, IssueWeb issue) {
         this.id = id;

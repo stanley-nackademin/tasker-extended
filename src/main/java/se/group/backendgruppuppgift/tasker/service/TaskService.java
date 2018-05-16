@@ -65,7 +65,6 @@ public final class TaskService {
     }
 
     public Optional<Task> updateTask(Long id, Task task) {
-        validateTask(task);
         Optional<Task> taskResult = taskRepository.findById(id);
 
         if (taskResult.isPresent()) {

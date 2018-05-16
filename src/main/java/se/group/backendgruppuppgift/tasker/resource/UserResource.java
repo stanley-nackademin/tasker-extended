@@ -6,21 +6,19 @@ import se.group.backendgruppuppgift.tasker.model.Issue;
 import se.group.backendgruppuppgift.tasker.model.Task;
 import se.group.backendgruppuppgift.tasker.model.User;
 import se.group.backendgruppuppgift.tasker.model.web.IssueWeb;
-import se.group.backendgruppuppgift.tasker.model.web.UserWeb;
 import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
+import se.group.backendgruppuppgift.tasker.model.web.UserWeb;
+import se.group.backendgruppuppgift.tasker.resource.converter.UserConverter;
 import se.group.backendgruppuppgift.tasker.service.UserService;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.*;
 import java.net.URI;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
-import static javax.ws.rs.core.Response.Status.NO_CONTENT;
+import static javax.ws.rs.core.Response.Status.*;
+
 @Component
 @Consumes(APPLICATION_JSON)
 @Produces(APPLICATION_JSON)
@@ -30,36 +28,25 @@ public final class UserResource {
     @Context
     private UriInfo uriInfo;
 
-    @Autowired
-    private UserService service;
+    private final UserService service;
+    private final UserConverter converter;
 
     public UserResource(UserService service) {
         this.service = service;
+        this.converter = new UserConverter();
     }
 
     @POST
-    public Response createUser(UserWeb user) {
-        UserWeb result = service.createUser(user);
+    public Response createUser(UserWeb userWeb) {
+        Optional<User> user = converter.fromWebToEntityData(userWeb);
+        service.createUser(user.get());
+        userWeb = converter.fromEntityToWebData(user.get()).get();
 
         return Response.created(URI.create(uriInfo
                 .getAbsolutePathBuilder()
-                .path(result.getUserNumber().toString())
+                .path(userWeb.getUserNumber().toString())
                 .toString()))
                 .build();
-    }
-
-    @DELETE
-    @Path("{userNumber}")
-    public Response deleteUserByUserNumber(@PathParam ("userNumber") Long userNumber){
-        Optional<UserWeb> result = service.deleteUserByUserNumber(userNumber);
-        return result.map(r -> Response.status(NO_CONTENT)).orElse(Response.status(NOT_FOUND)).build();
-    }
-
-    @PUT
-    @Path("{id}")
-    public Response updateUser(@PathParam("id") Long id, User user){
-        service.updateUser(user);
-        return Response.status(NO_CONTENT).build();
     }
 
     @GET
@@ -72,29 +59,27 @@ public final class UserResource {
     }
 
     @GET
-    @Path("/teams/{teamId}")
-    public Response getAllUsersByTeam(@PathParam("teamId") Long teamId){
-        return Response.ok(service.findUsersByTeamId(teamId)).build();
-    }
-
-    @GET
     public Response getUsers(@QueryParam("firstname") @DefaultValue("") String firstName,
-                             @QueryParam("lastname" ) @DefaultValue("") String lastName,
-                             @QueryParam("username") @DefaultValue("") String userName){
+                             @QueryParam("lastname") @DefaultValue("") String lastName,
+                             @QueryParam("username") @DefaultValue("") String userName) {
 
-        List<User> users = service.findAllUsersBy(firstName.toLowerCase(),lastName.toLowerCase(),userName.toLowerCase());
-        return Response.ok(service.findAllUsersBy(firstName.toLowerCase(),lastName.toLowerCase(),userName.toLowerCase())).build();
+        List<User> users = service.findAllUsersBy(firstName.toLowerCase(), lastName.toLowerCase(), userName.toLowerCase());
+
+        return Response.ok(users).build();
     }
 
-    //TODO ------------------------DENNA ÄR INTE KLAR.
+    @PUT
+    @Path("{usernumber}")
+    public Response updateUser(@PathParam("usernumber") Long userNumber, UserWeb userWeb) {
+        Optional<User> input = converter.fromWebToEntityData(userWeb);
+        Optional<UserWeb> output = converter.fromEntityToWebData(service.updateUser(userNumber, input.get()).get());
+
+        return output.map(r -> Response.status(NO_CONTENT)).orElse(Response.status(NOT_FOUND)).build();
+    }
 
     @PUT
     @Path("{userNumber}/activate")
-    public Response userDeActivator(@PathParam("userNumber")Long userNumber){
-//        return service.userActivator(userNumber)
-//                .map(Response::ok)
-//                .orElse(Response.status(NOT_FOUND))
-//                .build();
+    public Response userDeActivator(@PathParam("userNumber") Long userNumber) {
         service.userActivator(userNumber);
         return Response.status(NO_CONTENT).build();
     }
@@ -102,11 +87,18 @@ public final class UserResource {
     @PUT
     @Path("{userNumber}/tasks")
     public Response addTaskToUser(@PathParam("userNumber") Long userNumber, TaskWeb taskweb){
-
-
         return service.assignTaskToUser(userNumber, taskweb.getId()).map(t -> Response.ok(convertToWeb(t)))
                 .orElse(Response.status(NOT_FOUND))
                 .build();
+    }
+
+    @DELETE
+    @Path("{userNumber}")
+    public Response deleteUserByUserNumber(@PathParam("userNumber") Long userNumber) {
+        Optional<User> task = service.deleteUserByUserNumber(userNumber);
+        Optional<UserWeb> result = converter.fromEntityToWebData(task.get());
+
+        return result.map(r -> Response.status(NO_CONTENT)).orElse(Response.status(NOT_FOUND)).build();
     }
 
     private Task convertToTaskObject(TaskWeb taskWeb) {
