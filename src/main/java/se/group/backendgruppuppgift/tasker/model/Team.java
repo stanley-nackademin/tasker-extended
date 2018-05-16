@@ -17,7 +17,7 @@ public final class Team {
 
     protected Team() {}
 
-    public Team(String name, boolean isActive) {
+    public Team(String name, Boolean isActive) {
         this.name = name;
         this.isActive = isActive;
     }
