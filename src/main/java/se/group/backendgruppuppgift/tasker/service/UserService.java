@@ -170,6 +170,10 @@ public final class UserService {
 
                     }
                 }
+                else
+                {
+                    throw new InvalidTaskException("already has one");
+                }
 
 
 
