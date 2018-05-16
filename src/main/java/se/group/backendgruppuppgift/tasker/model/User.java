@@ -58,7 +58,7 @@ public final class User {
         return lastName;
     }
 
-    public boolean getIsActive() {
+    public Boolean getIsActive() {
         return isActive;
     }
 

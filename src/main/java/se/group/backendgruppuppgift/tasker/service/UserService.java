@@ -11,6 +11,7 @@ import se.group.backendgruppuppgift.tasker.repository.TaskRepository;
 import se.group.backendgruppuppgift.tasker.model.web.TeamWeb;
 import se.group.backendgruppuppgift.tasker.repository.TeamRepository;
 import se.group.backendgruppuppgift.tasker.repository.UserRepository;
+import se.group.backendgruppuppgift.tasker.resource.converter.UserConverter;
 import se.group.backendgruppuppgift.tasker.service.exception.InvalidUserException;
 import se.group.backendgruppuppgift.tasker.service.exception.InvalidTeamException;
 
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static org.apache.commons.lang3.StringUtils.*;
 
 
 @Service
@@ -84,8 +86,8 @@ public final class UserService {
         User newUser = newUserOpt.get();
         newUser.setIsActive(newUser.getIsActive() == true ? false : true);
 
+        newUser.setIsActive(newUser.getIsActive() == true ? false : true);
         if(newUser.getIsActive() == false){
-            //Lägg till kod för att ta ta bort user från Task och ändra status till Unstarted
             List<Task> task = taskRepository.findAllByUserUserNumber(newUser.getUserNumber());
             for(Task t: task){
                 t.setStatus(TaskStatus.UNSTARTED);
@@ -96,8 +98,24 @@ public final class UserService {
         return repository.save(newUser);
     }
 
-    public User updateUser(User user){
-        return repository.save(user);
+    //Ta emot user istället för webuser
+    public Optional<User> updateUser(Long userNumber, User user){
+        //UserConverter.getOptionalUserWeb(user);
+        Optional<User> result = repository.findByUserNumber(userNumber);
+
+        if(result.isPresent()){
+            User updatedUser = result.get();
+            if(!isBlank(user.getFirstName()))
+                updatedUser.setFirstName(user.getFirstName());
+            if(!isBlank(user.getLastName()))
+                updatedUser.setLastName(user.getLastName());
+            if (user.getIsActive() != null)
+                updatedUser.setIsActive(user.getIsActive());
+            if (!isBlank(user.getTeam().getId().toString()))
+                updatedUser.setTeam(user.getTeam());
+            return Optional.ofNullable(repository.save(updatedUser));
+        }
+        return Optional.empty();
     }
 
     // -------------------------------TODO DENNA ÄR INTE KLAR.

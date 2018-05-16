@@ -18,7 +18,6 @@ import java.util.Optional;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.*;
 
-
 @Component
 @Consumes(APPLICATION_JSON)
 @Produces(APPLICATION_JSON)
@@ -49,19 +48,23 @@ public final class UserResource {
                 .build();
     }
 
+    @PUT
+    @Path("{usernumber}")
+    public Response updateUser(@PathParam("usernumber") Long userNumber, UserWeb userWeb){
+        Optional<User> newUSer = UserConverter.getOptionalUser(userWeb);
+
+//        return service.updateUser(userNumber,UserConverter.getOptionalUser(userWeb))
+//                .map(t -> Response.ok(UserConverter.getOptionalUserWeb(t)))
+//                .orElse(Response.status(NOT_FOUND))
+//                .build();
+    }
+
     @DELETE
     @Path("{userNumber}")
     public Response deleteUserByUserNumber(@PathParam ("userNumber") Long userNumber){
         Optional<User> task = service.deleteUserByUserNumber(userNumber);
         Optional<UserWeb> result = converter.fromEntityToWebData(task.get());
         return result.map(r -> Response.status(NO_CONTENT)).orElse(Response.status(NOT_FOUND)).build();
-    }
-
-    @PUT
-    @Path("{id}")
-    public Response updateUser(@PathParam("id") Long id, User user){
-        service.updateUser(user);
-        return Response.status(NO_CONTENT).build();
     }
 
     @GET
