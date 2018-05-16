@@ -41,6 +41,10 @@ public final class Task {
         return status;
     }
 
+    public User getUser() {
+        return user;
+    }
+
     public Issue getIssue() {
         return issue;
     }

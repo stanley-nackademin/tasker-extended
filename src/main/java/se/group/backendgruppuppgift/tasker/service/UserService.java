@@ -150,35 +150,20 @@ public final class UserService {
     public Optional<Task> assignTaskToUser(Long userNumber, Long taskId){
 
         Optional<User> user = repository.findByUserNumber(userNumber);
-        Optional<Task> task =taskRepository.findById(taskId);
-
-       // User userResult = null;
-       // Task taskResult = null;
+        Optional<Task> task = taskRepository.findById(taskId);
 
         if(task.isPresent() && user.isPresent()){
 
                User userResult = user.get();
                Task taskResult = task.get();
 
+               notHasUser(taskResult);
+               isUserActive(userResult);
+               canAddTasks(userResult.getUserNumber());
 
-                if(notHasUser(taskResult)){
-                    if( userResult.getIsActive() && canAddTasks(userResult.getUserNumber())){
-                        taskResult.setUser(userResult);
-                        System.out.println("assigned");
+                taskResult.setUser(userResult);
 
-
-
-                    }
-                }
-                else
-                {
-                    throw new InvalidTaskException("already has one");
-                }
-
-
-
-            return Optional.ofNullable(taskRepository.save(taskResult));
-
+                return Optional.ofNullable(taskRepository.save(taskResult));
         }
 
         return Optional.empty();
@@ -214,21 +199,27 @@ public final class UserService {
         }
     }
 
-    private boolean canAddTasks(Long userNumber){
+    private void canAddTasks(Long userNumber){
         List<Task> tasks = taskRepository.findAllByUserUserNumber(userNumber);
-        boolean underTaskLimit = true;
-        if(tasks.size() > 5){
-            underTaskLimit = false;
+
+        if(tasks.size() >= 5){
+            throw new InvalidUserException("The user has already 5 tasks");
         }
 
-        return underTaskLimit;
+
     }
 
-    private boolean notHasUser(Task task){
-        boolean notHasUser = true;
-        if(task.getUser() != null){
-           notHasUser = false;
+    private void isUserActive(User user){
+
+        if(!user.getIsActive()){
+            throw new InvalidUserException("This user is npot active");
         }
-        return notHasUser;
+    }
+
+    private void notHasUser(Task task){
+
+        if(task.getUser() != null){
+           throw new InvalidTaskException("Task already has a user assigned");
+        }
     }
 }
