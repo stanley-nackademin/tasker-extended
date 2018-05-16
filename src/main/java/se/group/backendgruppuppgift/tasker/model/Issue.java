@@ -12,7 +12,8 @@ public final class Issue {
     @Column(nullable = false)
     private String description;
 
-    protected Issue() {}
+    protected Issue() {
+    }
 
     public Issue(String description) {
         this.description = description;

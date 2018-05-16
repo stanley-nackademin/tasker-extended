@@ -15,7 +15,8 @@ public final class Team {
     @Column(nullable = false)
     private Boolean isActive;
 
-    protected Team() {}
+    protected Team() {
+    }
 
     public Team(String name, Boolean isActive) {
         this.name = name;

@@ -1,10 +1,16 @@
 package se.group.backendgruppuppgift.tasker.service;
 
 import org.springframework.stereotype.Service;
-import se.group.backendgruppuppgift.tasker.model.*;
-import se.group.backendgruppuppgift.tasker.model.web.*;
-import se.group.backendgruppuppgift.tasker.repository.*;
-import se.group.backendgruppuppgift.tasker.service.exception.*;
+import se.group.backendgruppuppgift.tasker.model.Task;
+import se.group.backendgruppuppgift.tasker.model.TaskStatus;
+import se.group.backendgruppuppgift.tasker.model.Team;
+import se.group.backendgruppuppgift.tasker.model.User;
+import se.group.backendgruppuppgift.tasker.repository.TaskRepository;
+import se.group.backendgruppuppgift.tasker.repository.TeamRepository;
+import se.group.backendgruppuppgift.tasker.repository.UserRepository;
+import se.group.backendgruppuppgift.tasker.service.exception.InvalidTaskException;
+import se.group.backendgruppuppgift.tasker.service.exception.InvalidTeamException;
+import se.group.backendgruppuppgift.tasker.service.exception.InvalidUserException;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,8 +31,6 @@ public final class UserService {
         this.teamRepository = teamRepository;
         this.taskRepository = taskRepository;
     }
-
-    //CREATE
 
     public User createUser(User user) {
         Long userNumber;
@@ -50,10 +54,9 @@ public final class UserService {
 
         checkUsername(user);
         repository.save(user);
+
         return user;
     }
-
-    //READ
 
     public Optional<User> findUserByUserNumber(Long userNumber) {
         Optional<User> user = repository.findByUserNumber(userNumber);
@@ -61,6 +64,7 @@ public final class UserService {
         if (user.isPresent()) {
             return user;
         }
+
         return Optional.empty();
     }
 
@@ -68,12 +72,7 @@ public final class UserService {
         return repository.findFirstByOrderByUserNumberDesc().get();
     }
 
-    public List<User> findUsersByTeamId(Long teamId) {
-        return repository.findUsersByTeamId(teamId);
-    }
-
     public List<User> findAllUsersBy(String firstName, String lastName, String userName) {
-        System.out.println(firstName + lastName + userName);
         if (!firstName.isEmpty() && lastName.isEmpty() && userName.isEmpty()) {
             return repository.findUsersByFirstName(firstName);
         } else if (firstName.isEmpty() && !lastName.isEmpty() && userName.isEmpty()) {
@@ -98,22 +97,23 @@ public final class UserService {
 
         if (newUser.getIsActive() == false) {
             List<Task> task = taskRepository.findAllByUserUserNumber(newUser.getUserNumber());
+
             for (Task t : task) {
                 t.setStatus(TaskStatus.UNSTARTED);
                 t.setUser(null);
                 taskRepository.save(t);
             }
         }
+
         return repository.save(newUser);
     }
-
-    //UPDATE
 
     public Optional<User> updateUser(Long userNumber, User user) {
         Optional<User> result = repository.findByUserNumber(userNumber);
 
         if (result.isPresent()) {
             User updatedUser = result.get();
+
             if (!isBlank(user.getFirstName()))
                 updatedUser.setFirstName(user.getFirstName());
             if (!isBlank(user.getLastName()))
@@ -125,6 +125,7 @@ public final class UserService {
 
             return Optional.ofNullable(repository.save(updatedUser));
         }
+
         return Optional.empty();
     }
 
@@ -142,19 +143,19 @@ public final class UserService {
                 userResult.setTeam(team);
 
                 repository.save(userResult);
+
                 return Optional.ofNullable(team);
             }
         }
+
         return Optional.empty();
     }
 
     public Optional<Task> assignTaskToUser(Long userNumber, Long taskId) {
-
         Optional<User> user = repository.findByUserNumber(userNumber);
         Optional<Task> task = taskRepository.findById(taskId);
 
         if (task.isPresent() && user.isPresent()) {
-
             User userResult = user.get();
             Task taskResult = task.get();
 
@@ -170,13 +171,13 @@ public final class UserService {
         return Optional.empty();
     }
 
-    //DELETE
-
     public Optional<User> deleteUserByUserNumber(Long userNumber) {
         Optional<User> user = findUserByUserNumber(userNumber);
+
         if (user.isPresent()) {
             repository.removeByUserNumber(userNumber);
         }
+
         return user;
     }
 

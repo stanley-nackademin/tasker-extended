@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface UserRepository extends CrudRepository<User, Long> {
 
     @Transactional
-    Long removeByUserNumber (Long userNumber);
+    Long removeByUserNumber(Long userNumber);
 
     Optional<User> findByUserNumber(Long userNumber);
 

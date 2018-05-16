@@ -22,7 +22,8 @@ public final class Task {
     @JoinColumn(unique = true)
     private Issue issue;
 
-    protected Task() {}
+    protected Task() {
+    }
 
     public Task(String description) {
         this.description = description;

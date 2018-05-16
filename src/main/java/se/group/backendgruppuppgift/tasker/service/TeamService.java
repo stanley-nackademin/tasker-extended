@@ -25,6 +25,7 @@ public final class TeamService {
 
     public Team createTeam(Team team) {
         Team result = teamRepository.save(new Team(team.getName(), true));
+
         return result;
     }
 
@@ -45,12 +46,12 @@ public final class TeamService {
         Optional<Team> result = teamRepository.findByName(teamName);
         List<User> userList = new ArrayList<>();
 
-        if(result.isPresent()){
+        if (result.isPresent()) {
             Team team = result.get();
             userList = userRepository.findUsersByTeamId(team.getId());
         }
 
-        return  userList;
+        return userList;
     }
 
 
