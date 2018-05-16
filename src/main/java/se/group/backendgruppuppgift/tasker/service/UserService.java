@@ -11,9 +11,11 @@ import se.group.backendgruppuppgift.tasker.repository.TaskRepository;
 import se.group.backendgruppuppgift.tasker.model.web.TeamWeb;
 import se.group.backendgruppuppgift.tasker.repository.TeamRepository;
 import se.group.backendgruppuppgift.tasker.repository.UserRepository;
+import se.group.backendgruppuppgift.tasker.service.exception.InvalidTaskException;
 import se.group.backendgruppuppgift.tasker.service.exception.InvalidUserException;
 import se.group.backendgruppuppgift.tasker.service.exception.InvalidTeamException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
@@ -106,20 +108,6 @@ public final class UserService {
         return repository.save(user);
     }
 
-    // -------------------------------TODO DENNA ÄR INTE KLAR.
-    public Optional<TaskWeb> updateUserTask(Long userNumber, Long taskId){
-        Optional<User> userResult = repository.findByUserNumber(userNumber);
-        Optional<Task> taskResult = taskRepository.findById(taskId);
-
-        if(taskResult.isPresent()){
-            Task updatedTask = taskResult.get();
-            User updatedUser = userResult.get();
-            updatedTask.setUser(updatedUser);
-            return Optional.ofNullable(convertTaskToWeb(taskRepository.save(updatedTask)));
-        }
-        return Optional.empty();
-    }
-
     public List<User> findAllUsersBy(String firstName, String lastName, String userName){
         System.out.println(firstName + lastName + userName);
         if (!firstName.isEmpty() && lastName.isEmpty() && userName.isEmpty()){ // om allt är null förutom firstname
@@ -164,21 +152,32 @@ public final class UserService {
         Optional<User> user = repository.findByUserNumber(userNumber);
         Optional<Task> task =taskRepository.findById(taskId);
 
-        User userResult = null;
-        Task taskResult = null;
+       // User userResult = null;
+       // Task taskResult = null;
 
-        if(user.isPresent()){
-            userResult = user.get();
-            if(task.isPresent()){
-                taskResult = task.get();
-            }
+        if(task.isPresent() && user.isPresent()){
 
-            taskResult.setUser(userResult);
+               User userResult = user.get();
+               Task taskResult = task.get();
+
+
+                if(notHasUser(taskResult)){
+                    if( userResult.getIsActive() && canAddTasks(userResult.getUserNumber())){
+                        taskResult.setUser(userResult);
+                        System.out.println("assigned");
+
+
+
+                    }
+                }
+
+
+
+            return Optional.ofNullable(taskRepository.save(taskResult));
+
         }
 
-
-
-        return Optional.ofNullable(taskRepository.save(taskResult));
+        return Optional.empty();
     }
 
     private void maxUserLimitValidation(Team team) {
@@ -209,5 +208,23 @@ public final class UserService {
         if(user.getFirstName() == null || user.getFirstName().length() <= 10){
             throw new InvalidUserException("FirstName needs to be 10 characters or longer!");
         }
+    }
+
+    private boolean canAddTasks(Long userNumber){
+        List<Task> tasks = taskRepository.findAllByUserUserNumber(userNumber);
+        boolean underTaskLimit = true;
+        if(tasks.size() > 5){
+            underTaskLimit = false;
+        }
+
+        return underTaskLimit;
+    }
+
+    private boolean notHasUser(Task task){
+        boolean notHasUser = true;
+        if(task.getUser() != null){
+           notHasUser = false;
+        }
+        return notHasUser;
     }
 }
