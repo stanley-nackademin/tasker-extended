@@ -7,6 +7,7 @@ import se.group.backendgruppuppgift.tasker.model.User;
 import se.group.backendgruppuppgift.tasker.repository.IssueRepository;
 import se.group.backendgruppuppgift.tasker.repository.TaskRepository;
 import se.group.backendgruppuppgift.tasker.repository.UserRepository;
+import se.group.backendgruppuppgift.tasker.service.exception.InvalidIssueException;
 import se.group.backendgruppuppgift.tasker.service.exception.InvalidTaskException;
 
 import java.util.ArrayList;
@@ -38,12 +39,7 @@ public final class TaskService {
     }
 
     public Optional<Task> findTask(Long id) {
-        Optional<Task> result = taskRepository.findById(id);
-
-        if (result.isPresent())
-            return Optional.ofNullable(result.get());
-
-        return Optional.empty();
+        return taskRepository.findById(id);
     }
 
     public List<Task> findTasksByParams(String status, String team, String user, String text, String value) {
@@ -88,6 +84,7 @@ public final class TaskService {
     }
 
     public Optional<Task> assignIssue(Long id, Issue issue) {
+        validateIssue(issue);
         Optional<Task> task = taskRepository.findById(id);
 
         if (task.isPresent()) {
@@ -118,7 +115,6 @@ public final class TaskService {
     }
 
     private List<Task> findTasksByStatus(String status) {
-
         status = prepareString(status);
 
         switch (status) {
@@ -145,6 +141,12 @@ public final class TaskService {
     private void validateTaskStatus(Task task) {
         if (!(task.getStatus() == DONE))
             throw new InvalidTaskException("The current Task's status is not DONE");
+    }
+
+    private void validateIssue(Issue issue) {
+        if (isBlank(issue.getDescription())) {
+            throw new InvalidIssueException("Description can not be empty");
+        }
     }
 
     private List<Task> findByTeamId(String team) {

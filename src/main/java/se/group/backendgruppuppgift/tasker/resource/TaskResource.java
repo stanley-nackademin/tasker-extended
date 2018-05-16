@@ -105,10 +105,10 @@ public final class TaskResource {
     }
 
     private TaskWeb convertToTaskWeb(Task task) {
-        return new TaskWeb(task.getId(), task.getDescription(), task.getStatus(), convertIssueToWeb(task.getIssue()));
+        return new TaskWeb(task.getId(), task.getDescription(), task.getStatus(), convertToIssueWeb(task.getIssue()));
     }
 
-    private IssueWeb convertIssueToWeb(Issue issue) {
-        return issue != null ? new IssueWeb(issue.getDescription(), issue.getIsDone()) : null;
+    private IssueWeb convertToIssueWeb(Issue issue) {
+        return issue != null ? new IssueWeb(issue.getDescription()) : null;
     }
 }
