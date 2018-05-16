@@ -139,21 +139,21 @@ public final class UserService {
         }
     }
 
-    public Optional<TeamWeb> addTeam(Long id, UserWeb userWeb){
-        Optional<User> result = repository.findByUserNumber(userWeb.getUserNumber());
-        Optional<Team> resultTeam = teamRepository.findById(id);
+    public Optional<Team> addTeam(Long id, User user){
+        Optional<User> optionalUser = repository.findByUserNumber(user.getUserNumber());
+        Optional<Team> optionalTeam = teamRepository.findById(id);
 
-        if(result.isPresent()){
-            User user = result.get();
-            userTeamValidation(user);
+        if(optionalUser.isPresent()){
+            User userResult = optionalUser.get();
+            userTeamValidation(userResult);
 
-            if(resultTeam.isPresent()){
-                Team team = resultTeam.get();
+            if(optionalTeam.isPresent()){
+                Team team = optionalTeam.get();
                 maxUserLimitValidation(team);
-                user.setTeam(team);
+                userResult.setTeam(team);
 
-                repository.save(user);
-                return Optional.ofNullable(convertToTeamWeb(team));
+                repository.save(userResult);
+                return Optional.ofNullable(team);
             }
         }
         return Optional.empty();
