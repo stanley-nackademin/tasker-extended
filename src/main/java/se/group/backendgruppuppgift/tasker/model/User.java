@@ -70,10 +70,6 @@ public final class User {
         this.userNumber = userNumber;
     }
 
-    public void setActive(Boolean active) {
-        isActive = active;
-    }
-
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }

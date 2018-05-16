@@ -71,13 +71,6 @@ public final class UserService {
         return user;
     }
 
-    private UserWeb convertToWeb(User user) {
-        return new UserWeb(user.getUserNumber(),user.getUsername()
-                ,user.getFirstName(),user.getLastName()
-                , user.getIsActive(), user.getTeam());
-    }
-
-
     public User findLastUser(){
         return repository.findFirstByOrderByUserNumberDesc().get();
     }
@@ -89,6 +82,8 @@ public final class UserService {
     public User userActivator(Long userNumber){
         Optional<User> newUserOpt = repository.findByUserNumber(userNumber);
         User newUser = newUserOpt.get();
+        newUser.setIsActive(newUser.getIsActive() == true ? false : true);
+
         if(newUser.getIsActive() == false){
             //Lägg till kod för att ta ta bort user från Task och ändra status till Unstarted
             List<Task> task = taskRepository.findAllByUserUserNumber(newUser.getUserNumber());

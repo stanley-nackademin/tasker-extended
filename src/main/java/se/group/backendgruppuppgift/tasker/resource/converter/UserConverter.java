@@ -5,15 +5,17 @@ import se.group.backendgruppuppgift.tasker.model.web.UserWeb;
 
 import java.util.Optional;
 
-public class UserConverter{
+public class UserConverter implements ConverterInterface<UserWeb, Optional<?>, User>{
 
-    public static Optional<User> getOptionalUser(UserWeb userWeb){
+    @Override
+    public Optional<User> fromWebToEntityData(UserWeb userWeb) {
         User user = new User(userWeb.getUserNumber(), userWeb.getUsername()
                 , userWeb.getFirstName(), userWeb.getLastName(), userWeb.getTeam());
         return Optional.ofNullable(user);
     }
 
-    public static Optional<UserWeb> getOptionalUserWeb(User user){
+    @Override
+    public Optional<UserWeb> fromEntityToWebData(User user) {
         UserWeb userWeb = new UserWeb(user.getUserNumber(), user.getUsername()
                 , user.getFirstName(), user.getLastName(), user.getIsActive(), user.getTeam());
         return Optional.ofNullable(userWeb);

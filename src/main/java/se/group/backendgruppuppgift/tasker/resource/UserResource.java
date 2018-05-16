@@ -38,9 +38,9 @@ public final class UserResource {
 
     @POST
     public Response createUser(UserWeb userWeb) {
-        Optional<User> user = converter.getOptionalUser(userWeb);
+        Optional<User> user = converter.fromWebToEntityData(userWeb);
         service.createUser(user.get());
-        userWeb = converter.getOptionalUserWeb(user.get()).get();
+        userWeb = converter.fromEntityToWebData(user.get()).get();
 
         return Response.created(URI.create(uriInfo
                 .getAbsolutePathBuilder()
@@ -53,7 +53,7 @@ public final class UserResource {
     @Path("{userNumber}")
     public Response deleteUserByUserNumber(@PathParam ("userNumber") Long userNumber){
         Optional<User> task = service.deleteUserByUserNumber(userNumber);
-        Optional<UserWeb> result = converter.getOptionalUserWeb(task.get());
+        Optional<UserWeb> result = converter.fromEntityToWebData(task.get());
         return result.map(r -> Response.status(NO_CONTENT)).orElse(Response.status(NOT_FOUND)).build();
     }
 
@@ -101,10 +101,6 @@ public final class UserResource {
     @PUT
     @Path("{userNumber}/activate")
     public Response userDeActivator(@PathParam("userNumber")Long userNumber){
-//        return service.userActivator(userNumber)
-//                .map(Response::ok)
-//                .orElse(Response.status(NOT_FOUND))
-//                .build();
         service.userActivator(userNumber);
         return Response.status(NO_CONTENT).build();
     }
