@@ -49,7 +49,7 @@ public final class UserService {
         user.setIsActive(true);
 
         if (repository.findUserByUsername(user.getUsername()).isPresent()) {
-            throw new InvalidUserException("Username already in use");
+            throw new InvalidUserException("Username is already in use");
         }
 
         checkUsername(user);

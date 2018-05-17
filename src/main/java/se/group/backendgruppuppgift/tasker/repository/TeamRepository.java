@@ -10,7 +10,8 @@ import java.util.Optional;
 @Repository
 public interface TeamRepository extends CrudRepository<Team, Long> {
 
-    List<Team> findAll();
-
     Optional<Team> findByName(String name);
+
+    @Override
+    List<Team> findAll();
 }

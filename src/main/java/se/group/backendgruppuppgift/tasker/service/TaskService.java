@@ -33,9 +33,8 @@ public final class TaskService {
 
     public Task createTask(Task task) {
         validateTask(task);
-        Task result = taskRepository.save(new Task(task.getDescription(), task.getStatus()));
 
-        return result;
+        return taskRepository.save(new Task(task.getDescription(), task.getStatus()));
     }
 
     public Optional<Task> findTask(Long id) {
@@ -138,7 +137,7 @@ public final class TaskService {
     }
 
     private void validateTaskStatus(Task task) {
-        if (!(task.getStatus() == DONE))
+        if (task.getStatus() != DONE)
             throw new InvalidTaskException("The current Task's status is not DONE");
     }
 
@@ -149,20 +148,20 @@ public final class TaskService {
     }
 
     private List<Task> findByTeamId(String team) {
-        List<Task> taskList = new ArrayList<>();
+        List<Task> result = new ArrayList<>();
 
         if (team.matches("[0-9]+")) {
             Long teamId = Long.parseLong(team);
-            List<User> userList = userRepository.findUsersByTeamId(teamId);
+            List<User> users = userRepository.findUsersByTeamId(teamId);
 
-            for (User u : userList) {
+            for (User u : users) {
                 Long id = u.getId();
                 List<Task> tasks = taskRepository.findByUserId(id);
-                taskList.addAll(tasks);
+                result.addAll(tasks);
             }
         }
 
-        return taskList;
+        return result;
     }
 
     private List<Task> findByUserNumber(String userNumber) {

@@ -109,6 +109,6 @@ public final class TaskResource {
     }
 
     private IssueWeb convertToIssueWeb(Issue issue) {
-        return issue != null ? new IssueWeb(issue.getDescription()) : null;
+        return (issue != null) ? new IssueWeb(issue.getDescription()) : null;
     }
 }

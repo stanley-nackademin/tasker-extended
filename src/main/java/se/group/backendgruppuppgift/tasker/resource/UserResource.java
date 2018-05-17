@@ -1,6 +1,5 @@
 package se.group.backendgruppuppgift.tasker.resource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import se.group.backendgruppuppgift.tasker.model.Issue;
 import se.group.backendgruppuppgift.tasker.model.Task;
@@ -12,12 +11,16 @@ import se.group.backendgruppuppgift.tasker.resource.converter.UserConverter;
 import se.group.backendgruppuppgift.tasker.service.UserService;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import java.net.URI;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.Response.Status.*;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
+import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 
 @Component
 @Consumes(APPLICATION_JSON)
@@ -81,13 +84,14 @@ public final class UserResource {
     @Path("{userNumber}/activate")
     public Response userDeActivator(@PathParam("userNumber") Long userNumber) {
         service.userActivator(userNumber);
+
         return Response.status(NO_CONTENT).build();
     }
 
     @PUT
     @Path("{userNumber}/tasks")
-    public Response addTaskToUser(@PathParam("userNumber") Long userNumber, TaskWeb taskweb){
-        return service.assignTaskToUser(userNumber, taskweb.getId()).map(t -> Response.ok(convertToWeb(t)))
+    public Response addTaskToUser(@PathParam("userNumber") Long userNumber, TaskWeb taskweb) {
+        return service.assignTaskToUser(userNumber, taskweb.getId()).map(t -> Response.ok(convertToTaskWeb(t)))
                 .orElse(Response.status(NOT_FOUND))
                 .build();
     }
@@ -101,19 +105,11 @@ public final class UserResource {
         return result.map(r -> Response.status(NO_CONTENT)).orElse(Response.status(NOT_FOUND)).build();
     }
 
-    private Task convertToTaskObject(TaskWeb taskWeb) {
-        return new Task(taskWeb.getDescription(), taskWeb.getStatus());
+    private TaskWeb convertToTaskWeb(Task task) {
+        return new TaskWeb(task.getId(), task.getDescription(), task.getStatus(), convertToIssueWeb(task.getIssue()));
     }
 
-    private Issue convertToIssueObject(IssueWeb issueWeb) {
-        return new Issue(issueWeb.getDescription());
-    }
-
-    private TaskWeb convertToWeb(Task task) {
-        return new TaskWeb(task.getId(), task.getDescription(), task.getStatus(), convertIssueToWeb(task.getIssue()));
-    }
-
-    private IssueWeb convertIssueToWeb(Issue issue) {
+    private IssueWeb convertToIssueWeb(Issue issue) {
         return issue != null ? new IssueWeb(issue.getDescription()) : null;
     }
 }

@@ -7,7 +7,6 @@ import se.group.backendgruppuppgift.tasker.model.User;
 import se.group.backendgruppuppgift.tasker.model.web.TeamWeb;
 import se.group.backendgruppuppgift.tasker.model.web.UserWeb;
 import se.group.backendgruppuppgift.tasker.service.MasterService;
-import se.group.backendgruppuppgift.tasker.service.UserService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -30,12 +29,15 @@ public final class TeamResource {
     @Context
     private UriInfo uriInfo;
 
-    @Autowired
-    private MasterService service;
+    private final MasterService service;
+
+    public TeamResource(MasterService service) {
+        this.service = service;
+    }
 
     @POST
     public Response createTeam(TeamWeb teamWeb) {
-        Team result = service.getTeamService().createTeam(convertToTeamObject(teamWeb));
+        Team result = service.getTeamService().createTeam(convertToTeam(teamWeb));
         TeamWeb webResult = convertToTeamWeb(result);
 
         return Response.created(URI.create(uriInfo
@@ -66,7 +68,7 @@ public final class TeamResource {
     @PUT
     @Path("{id}")
     public Response updateTeam(@PathParam("id") Long id, TeamWeb teamWeb) {
-        return service.getTeamService().updateTeam(id, convertToTeamObject(teamWeb))
+        return service.getTeamService().updateTeam(id, convertToTeam(teamWeb))
                 .map(t -> Response.ok(convertToTeamWeb(t)))
                 .orElse(Response.status(NOT_FOUND))
                 .build();
@@ -74,8 +76,7 @@ public final class TeamResource {
 
     @PUT
     @Path("{id}/adduser")
-    public Response assignTeamToUser(@PathParam("id") Long id, UserWeb userWeb){
-
+    public Response assignTeamToUser(@PathParam("id") Long id, UserWeb userWeb) {
         return service.getUserService().addTeam(id, convertToUserObject(userWeb))
                 .map(t -> Response.ok(convertToTeamWeb(t)))
                 .orElse(Response.status(NOT_FOUND))
@@ -93,8 +94,7 @@ public final class TeamResource {
 
     @GET
     @Path("{teamName}/users")
-    public List<UserWeb> getAllUsersInTeam(@PathParam("teamName") String name){
-
+    public List<UserWeb> getAllUsersInTeam(@PathParam("teamName") String name) {
         List<UserWeb> result = new ArrayList<>();
         service.getTeamService().getAllUserByTeamName(name)
                 .forEach(t -> result.add(convertToUserWeb(t)));
@@ -102,7 +102,7 @@ public final class TeamResource {
         return result;
     }
 
-    private Team convertToTeamObject(TeamWeb teamWeb) {
+    private Team convertToTeam(TeamWeb teamWeb) {
         return new Team(teamWeb.getName(), teamWeb.getIsActive());
     }
 
@@ -110,7 +110,7 @@ public final class TeamResource {
         return new TeamWeb(team.getId(), team.getName(), team.getIsActive());
     }
 
-    private User convertToUserObject(UserWeb userWeb){
+    private User convertToUserObject(UserWeb userWeb) {
         return new User(userWeb.getUserNumber(), userWeb.getUsername(), userWeb.getFirstName(), userWeb.getLastName(), userWeb.getTeam());
     }
 

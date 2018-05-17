@@ -10,6 +10,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -22,7 +23,7 @@ import static javax.ws.rs.core.Response.Status.*;
 public final class IssueResource {
 
     @Context
-    UriInfo uriInfo;
+    private UriInfo uriInfo;
 
     private final IssueService service;
 
@@ -31,8 +32,11 @@ public final class IssueResource {
     }
 
     @GET
-    public List<Issue> getAllIssues() {
-        return service.getAll();
+    public List<IssueWeb> getAllIssues() {
+        List<IssueWeb> result = new ArrayList<>();
+        service.getAll().forEach(i -> result.add(convertToIssueWeb(i)));
+
+        return result;
     }
 
     @GET
@@ -58,6 +62,6 @@ public final class IssueResource {
     }
 
     private IssueWeb convertToIssueWeb(Issue issue) {
-        return issue != null ? new IssueWeb(issue.getDescription()) : null;
+        return new IssueWeb(issue.getDescription());
     }
 }
