@@ -5,6 +5,7 @@ import se.group.backendgruppuppgift.tasker.model.Issue;
 import se.group.backendgruppuppgift.tasker.model.Task;
 import se.group.backendgruppuppgift.tasker.model.web.IssueWeb;
 import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
+import se.group.backendgruppuppgift.tasker.resource.filter.AuthToken;
 import se.group.backendgruppuppgift.tasker.service.TaskService;
 
 import javax.ws.rs.*;
@@ -34,6 +35,7 @@ public final class TaskResource {
     }
 
     @POST
+    @AuthToken
     public Response createTask(TaskWeb taskWeb) {
         Task result = taskService.createTask(convertToTask(taskWeb));
         TaskWeb webResult = convertToTaskWeb(result);

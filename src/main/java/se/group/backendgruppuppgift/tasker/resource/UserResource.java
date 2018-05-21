@@ -8,6 +8,7 @@ import se.group.backendgruppuppgift.tasker.model.web.IssueWeb;
 import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
 import se.group.backendgruppuppgift.tasker.model.web.UserWeb;
 import se.group.backendgruppuppgift.tasker.resource.converter.UserConverter;
+import se.group.backendgruppuppgift.tasker.resource.filter.AuthToken;
 import se.group.backendgruppuppgift.tasker.service.UserService;
 
 import javax.ws.rs.*;
@@ -40,6 +41,7 @@ public final class UserResource {
     }
 
     @POST
+    @AuthToken
     public Response createUser(UserWeb userWeb) {
         Optional<User> user = converter.fromWebToEntityData(userWeb);
         service.createUser(user.get());

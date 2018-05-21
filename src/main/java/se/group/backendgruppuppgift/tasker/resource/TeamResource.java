@@ -6,6 +6,7 @@ import se.group.backendgruppuppgift.tasker.model.Team;
 import se.group.backendgruppuppgift.tasker.model.User;
 import se.group.backendgruppuppgift.tasker.model.web.TeamWeb;
 import se.group.backendgruppuppgift.tasker.model.web.UserWeb;
+import se.group.backendgruppuppgift.tasker.resource.filter.AuthToken;
 import se.group.backendgruppuppgift.tasker.service.MasterService;
 
 import javax.ws.rs.*;
@@ -36,6 +37,7 @@ public final class TeamResource {
     }
 
     @POST
+    @AuthToken
     public Response createTeam(TeamWeb teamWeb) {
         Team result = service.getTeamService().createTeam(convertToTeam(teamWeb));
         TeamWeb webResult = convertToTeamWeb(result);
