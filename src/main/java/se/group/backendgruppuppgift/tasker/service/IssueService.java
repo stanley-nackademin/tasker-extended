@@ -6,7 +6,6 @@ import se.group.backendgruppuppgift.tasker.model.Issue;
 import se.group.backendgruppuppgift.tasker.repository.IssueRepository;
 import se.group.backendgruppuppgift.tasker.service.exception.InvalidIssueException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +14,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @Service
 public final class IssueService {
 
-    private static final int PAGE_SIZE = 1;
+    private static final int PAGE_SIZE = 10;
 
     private final IssueRepository repository;
 
