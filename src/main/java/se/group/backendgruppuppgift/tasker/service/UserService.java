@@ -1,5 +1,6 @@
 package se.group.backendgruppuppgift.tasker.service;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import se.group.backendgruppuppgift.tasker.model.Task;
 import se.group.backendgruppuppgift.tasker.model.TaskStatus;
@@ -21,6 +22,8 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Service
 public final class UserService {
+
+    private static final int PAGE_SIZE = 10;
 
     private final UserRepository repository;
     private final TeamRepository teamRepository;
@@ -72,21 +75,29 @@ public final class UserService {
         return repository.findFirstByOrderByUserNumberDesc().get();
     }
 
-    public List<User> findAllUsersBy(String firstName, String lastName, String userName) {
-        if (!firstName.isEmpty() && lastName.isEmpty() && userName.isEmpty()) {
+    public List<User> findAllUsersBy(String firstName, String lastName, String userName, String page) {
+        if (!firstName.isEmpty() && lastName.isEmpty() && userName.isEmpty() && page.isEmpty()) {
             return repository.findUsersByFirstName(firstName);
-        } else if (firstName.isEmpty() && !lastName.isEmpty() && userName.isEmpty()) {
+        } else if (firstName.isEmpty() && !lastName.isEmpty() && userName.isEmpty() && page.isEmpty()) {
             return repository.findUsersByLastName(lastName);
-        } else if (firstName.isEmpty() && lastName.isEmpty() && !userName.isEmpty()) {
+        } else if (firstName.isEmpty() && lastName.isEmpty() && !userName.isEmpty() && page.isEmpty()) {
             return repository.findUsersByUsername(userName);
-        } else if (!firstName.isEmpty() && !lastName.isEmpty() && userName.isEmpty()) {
+        } else if (!firstName.isEmpty() && !lastName.isEmpty() && userName.isEmpty() && page.isEmpty()) {
             return repository.findUsersByFirstNameAndLastName(firstName, lastName);
-        } else if (!firstName.isEmpty() && lastName.isEmpty() && !userName.isEmpty()) {
+        } else if (!firstName.isEmpty() && lastName.isEmpty() && !userName.isEmpty() && page.isEmpty()) {
             return repository.findUsersByFirstNameAndUsername(firstName, userName);
-        } else if (firstName.isEmpty() && !lastName.isEmpty() && !userName.isEmpty()) {
+        } else if (firstName.isEmpty() && !lastName.isEmpty() && !userName.isEmpty() && page.isEmpty()) {
             return repository.findUsersByUsernameAndLastName(userName, lastName);
-        } else {
+        } else if (firstName.isEmpty() && lastName.isEmpty() && userName.isEmpty() && !page.isEmpty()) {
+            if (isDigit(page)) {
+                return repository.findAll(PageRequest.of(Integer.parseInt(page), PAGE_SIZE)).getContent();
+            } else {
+                return repository.findAll(PageRequest.of(0, PAGE_SIZE)).getContent();
+            }
+        } else if (!firstName.isEmpty() && !lastName.isEmpty() && !userName.isEmpty() && page.isEmpty()) {
             return repository.findUsersByFirstNameAndLastNameAndUsername(firstName, lastName, userName);
+        } else {
+            return repository.findAll();
         }
     }
 
@@ -219,5 +230,9 @@ public final class UserService {
         if (task.getUser() != null) {
             throw new InvalidTaskException("Task already has a user assigned");
         }
+    }
+
+    private boolean isDigit(String number) {
+        return number.matches("[0-9]+");
     }
 }

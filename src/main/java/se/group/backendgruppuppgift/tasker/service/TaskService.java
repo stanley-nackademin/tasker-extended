@@ -1,5 +1,6 @@
 package se.group.backendgruppuppgift.tasker.service;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import se.group.backendgruppuppgift.tasker.model.Issue;
 import se.group.backendgruppuppgift.tasker.model.Task;
@@ -21,6 +22,8 @@ import static se.group.backendgruppuppgift.tasker.model.TaskStatus.*;
 @Service
 public final class TaskService {
 
+    private static final int PAGE_SIZE = 10;
+
     private final TaskRepository taskRepository;
     private final IssueRepository issueRepository;
     private final UserRepository userRepository;
@@ -41,21 +44,27 @@ public final class TaskService {
         return taskRepository.findById(id);
     }
 
-    public List<Task> findTasksByParams(String status, String team, String user, String text, String value) {
+    public List<Task> findTasksByParams(String status, String team, String user, String text, String issue, String page) {
         List<Task> result;
 
-        if (!isBlank(status) && isAllBlank(team, user, text, value)) {
+        if (!isBlank(status) && isAllBlank(team, user, text, issue, page)) {
             result = findTasksByStatus(status);
-        } else if (!isBlank(team) && isAllBlank(status, user, text, value)) {
+        } else if (!isBlank(team) && isAllBlank(status, user, text, issue, page)) {
             result = findByTeamId(team);
-        } else if (!isBlank(user) && isAllBlank(status, team, text, value)) {
+        } else if (!isBlank(user) && isAllBlank(status, team, text, issue, page)) {
             result = findByUserNumber(user);
-        } else if (!isBlank(text) && isAllBlank(status, team, user, value)) {
+        } else if (!isBlank(text) && isAllBlank(status, team, user, issue, page)) {
             result = taskRepository.findByDescriptionContains(text);
-        } else if (!isBlank(value) && value.equals("true") && isAllBlank(status, team, user, text)) {
+        } else if (!isBlank(issue) && issue.equals("true") && isAllBlank(status, team, user, text, page)) {
             result = taskRepository.findByIssueNotNull();
-        } else if (!isBlank(value) && value.equals("false") && isAllBlank(status, team, user, text)) {
+        } else if (!isBlank(issue) && issue.equals("false") && isAllBlank(status, team, user, text, page)) {
             result = taskRepository.findByIssueNull();
+        } else if (!isBlank(page) && isAllBlank(status, team, user, text, issue)) {
+            if (isDigit(page)) {
+                result = taskRepository.findAll(PageRequest.of(Integer.parseInt(page), PAGE_SIZE)).getContent();
+            } else {
+                result = taskRepository.findAll(PageRequest.of(0, PAGE_SIZE)).getContent();
+            }
         } else {
             result = taskRepository.findAll();
         }
@@ -145,6 +154,10 @@ public final class TaskService {
         if (isBlank(issue.getDescription())) {
             throw new InvalidIssueException("Description can not be empty");
         }
+    }
+
+    private boolean isDigit(String number) {
+        return number.matches("[0-9]+");
     }
 
     private List<Task> findByTeamId(String team) {

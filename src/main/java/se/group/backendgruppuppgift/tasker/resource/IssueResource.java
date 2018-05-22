@@ -32,9 +32,9 @@ public final class IssueResource {
     }
 
     @GET
-    public List<IssueWeb> getAllIssues() {
+    public List<IssueWeb> getAll(@QueryParam("page") String page) {
         List<IssueWeb> result = new ArrayList<>();
-        service.getAll().forEach(i -> result.add(convertToIssueWeb(i)));
+        service.getAll(page).forEach(i -> result.add(convertToIssueWeb(i)));
 
         return result;
     }

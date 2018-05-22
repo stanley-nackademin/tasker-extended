@@ -1,6 +1,6 @@
 package se.group.backendgruppuppgift.tasker.repository;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 import se.group.backendgruppuppgift.tasker.model.Team;
 import se.group.backendgruppuppgift.tasker.model.User;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends CrudRepository<User, Long> {
+public interface UserRepository extends PagingAndSortingRepository<User, Long> {
 
     @Transactional
     Long removeByUserNumber(Long userNumber);
@@ -38,4 +38,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
     List<User> findUsersByFirstNameAndLastNameAndUsername(String firstName, String lastName, String userName);
 
     Optional<User> findUserByUsername(String username);
+
+    @Override
+    List<User> findAll();
 }

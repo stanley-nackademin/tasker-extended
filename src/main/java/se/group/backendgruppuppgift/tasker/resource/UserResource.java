@@ -66,9 +66,10 @@ public final class UserResource {
     @GET
     public Response getUsers(@QueryParam("firstname") @DefaultValue("") String firstName,
                              @QueryParam("lastname") @DefaultValue("") String lastName,
-                             @QueryParam("username") @DefaultValue("") String userName) {
+                             @QueryParam("username") @DefaultValue("") String userName,
+                             @QueryParam("page") @DefaultValue("") String page) {
 
-        List<User> users = service.findAllUsersBy(firstName.toLowerCase(), lastName.toLowerCase(), userName.toLowerCase());
+        List<User> users = service.findAllUsersBy(firstName.toLowerCase(), lastName.toLowerCase(), userName.toLowerCase(), page);
 
         return Response.ok(users).build();
     }
