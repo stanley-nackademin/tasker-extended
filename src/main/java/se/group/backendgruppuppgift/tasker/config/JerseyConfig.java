@@ -18,6 +18,7 @@ public class JerseyConfig extends ResourceConfig {
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper().registerModule(new ParameterNamesModule());
         mapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
+        mapper.configure(DeserializationFeature.READ_ENUMS_USING_TO_STRING, true);
 
         return mapper;
     }

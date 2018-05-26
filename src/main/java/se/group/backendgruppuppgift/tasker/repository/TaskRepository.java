@@ -1,6 +1,6 @@
 package se.group.backendgruppuppgift.tasker.repository;
 
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import se.group.backendgruppuppgift.tasker.model.Task;
 import se.group.backendgruppuppgift.tasker.model.TaskStatus;
@@ -8,7 +8,7 @@ import se.group.backendgruppuppgift.tasker.model.TaskStatus;
 import java.util.List;
 
 @Repository
-public interface TaskRepository extends PagingAndSortingRepository<Task, Long> {
+public interface TaskRepository extends JpaRepository<Task, Long> {
 
     List<Task> findByStatus(TaskStatus status);
 
@@ -21,7 +21,4 @@ public interface TaskRepository extends PagingAndSortingRepository<Task, Long> {
     List<Task> findByIssueNull();
 
     List<Task> findAllByUserUserNumber(Long userNumber);
-
-    @Override
-    List<Task> findAll();
 }

@@ -1,12 +1,12 @@
 package se.group.backendgruppuppgift.tasker.model.web;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 public final class IssueWeb {
 
-    private String description;
+    private final String description;
 
-    protected IssueWeb() {
-    }
-
+    @JsonCreator
     public IssueWeb(String description) {
         this.description = description;
     }

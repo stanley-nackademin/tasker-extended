@@ -49,12 +49,11 @@ public final class IssueService {
         if (result.isPresent()) {
             Issue updatedIssue = result.get();
             updatedIssue.setDescription(issue.getDescription());
-            updatedIssue = repository.save(updatedIssue);
 
-            return Optional.ofNullable(updatedIssue);
+            return Optional.of(repository.save(updatedIssue));
         }
 
-        return Optional.empty();
+        return result;
     }
 
     private void validateIssue(Issue issue) {

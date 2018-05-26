@@ -4,13 +4,10 @@ import se.group.backendgruppuppgift.tasker.model.TaskStatus;
 
 public final class TaskWeb {
 
-    private Long id;
-    private String description;
-    private TaskStatus status;
-    private IssueWeb issue;
-
-    protected TaskWeb() {
-    }
+    private final Long id;
+    private final String description;
+    private final TaskStatus status;
+    private final IssueWeb issue;
 
     public TaskWeb(Long id, String description, TaskStatus status, IssueWeb issue) {
         this.id = id;

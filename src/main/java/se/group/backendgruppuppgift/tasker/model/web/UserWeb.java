@@ -4,15 +4,12 @@ import se.group.backendgruppuppgift.tasker.model.Team;
 
 public final class UserWeb {
 
-    private Long userNumber;
-    private String username;
-    private String firstName;
-    private String lastName;
-    private Boolean isActive;
-    private Team team;
-
-    protected UserWeb() {
-    }
+    private final Long userNumber;
+    private final String username;
+    private final String firstName;
+    private final String lastName;
+    private final Boolean isActive;
+    private final Team team;
 
     public UserWeb(Long userNumber, String username, String firstName, String lastName, Boolean isActive, Team team) {
         this.userNumber = userNumber;

@@ -3,23 +3,17 @@ package se.group.backendgruppuppgift.tasker.resource.converter;
 import se.group.backendgruppuppgift.tasker.model.User;
 import se.group.backendgruppuppgift.tasker.model.web.UserWeb;
 
-import java.util.Optional;
-
-public final class UserConverter implements ConverterInterface<UserWeb, Optional<?>, User> {
+public final class UserConverter implements ConverterInterface<UserWeb, Object, User> {
 
     @Override
-    public Optional<User> fromWebToEntityData(UserWeb userWeb) {
-        User user = new User(userWeb.getUserNumber(), userWeb.getUsername(),
+    public User fromWebToEntityData(UserWeb userWeb) {
+        return new User(userWeb.getUserNumber(), userWeb.getUsername(),
                 userWeb.getFirstName(), userWeb.getLastName(), userWeb.getTeam());
-
-        return Optional.ofNullable(user);
     }
 
     @Override
-    public Optional<UserWeb> fromEntityToWebData(User user) {
-        UserWeb userWeb = new UserWeb(user.getUserNumber(), user.getUsername(),
+    public UserWeb fromEntityToWebData(User user) {
+        return new UserWeb(user.getUserNumber(), user.getUsername(),
                 user.getFirstName(), user.getLastName(), user.getIsActive(), user.getTeam());
-
-        return Optional.ofNullable(userWeb);
     }
 }
