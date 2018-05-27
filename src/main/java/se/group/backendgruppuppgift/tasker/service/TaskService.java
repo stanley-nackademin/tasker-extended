@@ -11,10 +11,12 @@ import se.group.backendgruppuppgift.tasker.repository.UserRepository;
 import se.group.backendgruppuppgift.tasker.service.exception.InvalidIssueException;
 import se.group.backendgruppuppgift.tasker.service.exception.InvalidTaskException;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static org.apache.commons.lang3.StringUtils.isAllBlank;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static se.group.backendgruppuppgift.tasker.model.TaskStatus.*;
@@ -44,27 +46,37 @@ public final class TaskService {
         return taskRepository.findById(id);
     }
 
-    public List<Task> findTasksByParams(String status, String team, String user, String text, String issue, String page) {
+    public List<Task> findTasksByParams(String status, String team, String user, String text, String issue,
+                                        String page, String startDate, String endDate) {
         List<Task> result;
 
-        if (!isBlank(status) && isAllBlank(team, user, text, issue, page)) {
+        if (!isBlank(status) && isAllBlank(team, user, text, issue, page, startDate, endDate)) {
             result = findTasksByStatus(status);
-        } else if (!isBlank(team) && isAllBlank(status, user, text, issue, page)) {
+        } else if (!isBlank(team) && isAllBlank(status, user, text, issue, page, startDate, endDate)) {
             result = findByTeamId(team);
-        } else if (!isBlank(user) && isAllBlank(status, team, text, issue, page)) {
+        } else if (!isBlank(user) && isAllBlank(status, team, text, issue, page, startDate, endDate)) {
             result = findByUserNumber(user);
-        } else if (!isBlank(text) && isAllBlank(status, team, user, issue, page)) {
+        } else if (!isBlank(text) && isAllBlank(status, team, user, issue, page, startDate, endDate)) {
             result = taskRepository.findByDescriptionContains(text);
-        } else if (!isBlank(issue) && issue.equals("true") && isAllBlank(status, team, user, text, page)) {
+        } else if (!isBlank(issue) && issue.equals("true") && isAllBlank(status, team, user, text, page, startDate, endDate)) {
             result = taskRepository.findByIssueNotNull();
-        } else if (!isBlank(issue) && issue.equals("false") && isAllBlank(status, team, user, text, page)) {
+        } else if (!isBlank(issue) && issue.equals("false") && isAllBlank(status, team, user, text, page, startDate, endDate)) {
             result = taskRepository.findByIssueNull();
-        } else if (!isBlank(page) && isAllBlank(status, team, user, text, issue)) {
+        } else if (!isBlank(page) && isAllBlank(status, team, user, text, issue, startDate, endDate)) {
             if (isDigit(page)) {
                 result = taskRepository.findAll(PageRequest.of(Integer.parseInt(page), PAGE_SIZE)).getContent();
             } else {
                 result = taskRepository.findAll(PageRequest.of(0, PAGE_SIZE)).getContent();
             }
+        } else if (!isAllBlank(startDate, endDate) && isAllBlank(status, team, user, text, issue, page)) {
+            validateDate(startDate);
+            validateDate(endDate);
+
+            LocalDate localStartDate = LocalDate.parse(startDate, ISO_DATE);
+            LocalDate localEndDate = LocalDate.parse(endDate, ISO_DATE);
+            validateDateRange(localStartDate, localEndDate);
+
+            result = taskRepository.findAllByFinishDateBetween(localStartDate, localEndDate);
         } else {
             result = taskRepository.findAll();
         }
@@ -82,7 +94,12 @@ public final class TaskService {
                 updatedTask.setDescription(task.getDescription());
             }
 
-            if (!isBlank(task.getStatus().toString())) {
+            if (task.getStatus() != null) {
+                if (!updatedTask.getStatus().equals(DONE) && task.getStatus().equals(DONE)) {
+                    updatedTask.setFinishDate(LocalDate.now());
+                } else if (updatedTask.getStatus().equals(DONE) && !task.getStatus().equals(DONE)) {
+                    updatedTask.setFinishDate(null);
+                }
                 updatedTask.setStatus(task.getStatus());
             }
 
@@ -155,6 +172,18 @@ public final class TaskService {
     private void validateIssue(Issue issue) {
         if (isBlank(issue.getDescription())) {
             throw new InvalidIssueException("Description can not be empty");
+        }
+    }
+
+    private void validateDate(String date) {
+        if (!date.matches("^(19|20)\\d\\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$")) {
+            throw new InvalidTaskException("Invalid date");
+        }
+    }
+
+    private void validateDateRange(LocalDate startDate, LocalDate endDate) {
+        if (startDate.isAfter(endDate)) {
+            throw new InvalidTaskException("Invalid date range");
         }
     }
 

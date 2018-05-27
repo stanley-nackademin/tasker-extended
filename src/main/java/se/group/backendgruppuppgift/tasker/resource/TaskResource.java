@@ -63,10 +63,12 @@ public final class TaskResource {
             @QueryParam("user") @DefaultValue("") String user,
             @QueryParam("text") @DefaultValue("") String text,
             @QueryParam("issue") @DefaultValue("") String issue,
-            @QueryParam("page") @DefaultValue("") String page) {
+            @QueryParam("page") @DefaultValue("") String page,
+            @QueryParam("startdate") @DefaultValue("") String startDate,
+            @QueryParam("enddate") @DefaultValue("") String endDate) {
 
         List<TaskWeb> result = new ArrayList<>();
-        taskService.findTasksByParams(status, team, user, text, issue, page)
+        taskService.findTasksByParams(status, team, user, text, issue, page, startDate, endDate)
                 .forEach(t -> result.add(convertToTaskWeb(t)));
 
         return result;

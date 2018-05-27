@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import se.group.backendgruppuppgift.tasker.model.Task;
 import se.group.backendgruppuppgift.tasker.model.TaskStatus;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -21,4 +22,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByIssueNull();
 
     List<Task> findAllByUserUserNumber(Long userNumber);
+
+    List<Task> findAllByFinishDateBetween(LocalDate startDate, LocalDate endDate);
 }

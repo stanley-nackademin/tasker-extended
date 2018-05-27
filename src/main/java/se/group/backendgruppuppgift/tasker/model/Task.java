@@ -1,6 +1,7 @@
 package se.group.backendgruppuppgift.tasker.model;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 public final class Task {
@@ -21,6 +22,8 @@ public final class Task {
     @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(unique = true)
     private Issue issue;
+
+    private LocalDate finishDate;
 
     protected Task() {
     }
@@ -50,6 +53,10 @@ public final class Task {
         return issue;
     }
 
+    public LocalDate getFinishDate() {
+        return finishDate;
+    }
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -66,11 +73,15 @@ public final class Task {
         this.issue = issue;
     }
 
+    public void setFinishDate(LocalDate finishDate) {
+        this.finishDate = finishDate;
+    }
+
     @Override
     public String toString() {
         return String.format(
-                "Task[id=%d, description='%s', status='%s', user=%s, issue=%s]",
-                id, description, status, user, issue
+                "Task[id=%d, description='%s', status='%s', user=%s, issue=%s, finishDate=%s]",
+                id, description, status, user, issue, finishDate
         );
     }
 }
