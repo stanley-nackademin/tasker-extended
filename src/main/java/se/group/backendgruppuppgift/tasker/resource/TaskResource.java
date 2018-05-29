@@ -28,6 +28,9 @@ public final class TaskResource {
     @Context
     private UriInfo uriInfo;
 
+    @Context
+    private BroadcasterResource broadcaster;
+
     private final TaskService taskService;
 
     public TaskResource(TaskService taskService) {
@@ -39,6 +42,8 @@ public final class TaskResource {
     public Response createTask(TaskWeb taskWeb) {
         Task result = taskService.createTask(convertToTask(taskWeb));
         TaskWeb webResult = convertToTaskWeb(result);
+
+        broadcaster.sendMessage(webResult);
 
         return Response.created(URI.create(uriInfo
                 .getAbsolutePathBuilder()
