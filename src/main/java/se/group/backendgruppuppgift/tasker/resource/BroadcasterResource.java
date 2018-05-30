@@ -1,6 +1,7 @@
 package se.group.backendgruppuppgift.tasker.resource;
 
 import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
+import se.group.backendgruppuppgift.tasker.resource.filter.Cors;
 
 import javax.inject.Singleton;
 import javax.ws.rs.*;
@@ -41,13 +42,14 @@ public class BroadcasterResource {
     }
 
     @GET
+    @Cors
     @Produces(SERVER_SENT_EVENTS)
     @Path("events")
     public void listenToBroadcast(@Context SseEventSink eventSink) {
         this.broadcaster.register(eventSink);
     }
 
-    public void sendMessage(TaskWeb task) {
+    public void taskNotify(TaskWeb task) {
         final OutboundSseEvent event = sse.newEventBuilder()
                 .name("message")
                 .mediaType(APPLICATION_JSON_TYPE)

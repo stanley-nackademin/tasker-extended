@@ -43,7 +43,7 @@ public final class TaskResource {
         Task result = taskService.createTask(convertToTask(taskWeb));
         TaskWeb webResult = convertToTaskWeb(result);
 
-        broadcaster.sendMessage(webResult);
+        broadcaster.taskNotify(webResult);
 
         return Response.created(URI.create(uriInfo
                 .getAbsolutePathBuilder()
