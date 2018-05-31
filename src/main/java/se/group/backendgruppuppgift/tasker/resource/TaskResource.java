@@ -6,17 +6,24 @@ import se.group.backendgruppuppgift.tasker.model.Task;
 import se.group.backendgruppuppgift.tasker.model.web.IssueWeb;
 import se.group.backendgruppuppgift.tasker.model.web.TaskWeb;
 import se.group.backendgruppuppgift.tasker.resource.filter.AuthToken;
+import se.group.backendgruppuppgift.tasker.resource.filter.Cors;
 import se.group.backendgruppuppgift.tasker.service.TaskService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.sse.OutboundSseEvent;
+import javax.ws.rs.sse.Sse;
+import javax.ws.rs.sse.SseBroadcaster;
+import javax.ws.rs.sse.SseEventSink;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
+import static javax.ws.rs.core.MediaType.SERVER_SENT_EVENTS;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 @Component
@@ -29,7 +36,8 @@ public final class TaskResource {
     private UriInfo uriInfo;
 
     @Context
-    private BroadcasterResource broadcaster;
+    private Sse sse;
+    private SseBroadcaster broadcaster;
 
     private final TaskService taskService;
 
@@ -43,7 +51,7 @@ public final class TaskResource {
         Task result = taskService.createTask(convertToTask(taskWeb));
         TaskWeb webResult = convertToTaskWeb(result);
 
-        broadcaster.taskNotify(webResult);
+        taskNotify(webResult);
 
         return Response.created(URI.create(uriInfo
                 .getAbsolutePathBuilder()
@@ -79,6 +87,18 @@ public final class TaskResource {
         return result;
     }
 
+    @GET
+    @Cors
+    @Produces(SERVER_SENT_EVENTS)
+    @Path("events")
+    public void listenToBroadcast(@Context SseEventSink eventSink) {
+        if (broadcaster == null) {
+            broadcaster = sse.newBroadcaster();
+        }
+
+        broadcaster.register(eventSink);
+    }
+
     @PUT
     @Path("{id}")
     public Response updateTask(@PathParam("id") Long id, TaskWeb taskWeb) {
@@ -104,6 +124,20 @@ public final class TaskResource {
                 .map(t -> Response.noContent())
                 .orElse(Response.status(NOT_FOUND))
                 .build();
+    }
+
+    private void taskNotify(TaskWeb task) {
+        final OutboundSseEvent event = sse.newEventBuilder()
+                .name("message")
+                .mediaType(APPLICATION_JSON_TYPE)
+                .data(TaskWeb.class, task)
+                .build();
+
+        if (broadcaster == null) {
+            broadcaster = sse.newBroadcaster();
+        }
+
+        broadcaster.broadcast(event);
     }
 
     private Task convertToTask(TaskWeb taskWeb) {
